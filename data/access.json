@@ -3,8 +3,23 @@
   "admin": "richin-dev",
   "uploads": "admin",
   "users": {
-    "example-cousin": [
-      "05-rappai-rosa.json"
+    "lonappan": [
+      "01-lonappan-maryam.json"
+    ],
+    "ouseph": [
+      "02-ouseph-eliya.json"
+    ],
+    "anthony": [
+      "03-anthony-maryam.json"
+    ],
+    "cherya": [
+      "04-cherya-rosa.json"
+    ],
+    "kunjilla": [
+      "06-rappai-kunjilla.json"
+    ],
+    "vareeth": [
+      "07-vareeth-eliyakkuty.json"
     ]
   }
 }

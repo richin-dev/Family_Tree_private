@@ -76,7 +76,7 @@ node scripts/make-user.mjs remove alice
 node scripts/make-user.mjs print               # → paste into Cloudflare env var AUTH_USERS, then redeploy/save
 ```
 - Give each person their username and password privately. Only **salted password hashes** are kept (in `.auth/users.json` on your computer — git-ignored — and in the Cloudflare variable). Nobody, including you, can read a password back.
-- `--github` links the login to the person's GitHub username so the site knows which branches they may edit without asking them.
+- `--github` is the access key matched against `data/access.json`. For a branch-limited direct-save login, it can be a unique alias; the editor does not need a GitHub account. Keep the admin's key mapped to `admin` so that account retains full access.
 - **Remove someone**: `remove`, `print`, update `AUTH_USERS` — their session stops working at once. To sign everybody out, add/raise an env var `SESSION_EPOCH` (e.g. `2`).
 - The password check, the session cookie (HttpOnly, SameSite=Strict, 7 days) and the rules for what a visitor may fetch run on Cloudflare's server in `functions/` — not in the browser. Visitors can read the page and public data; photos, the access list, and other private resources need a session.
 - Try it on your computer first: copy `.dev.vars.example` to `.dev.vars`, fill it in, then `node scripts/build.mjs && node scripts/dev-server.mjs` → http://localhost:8788 .
