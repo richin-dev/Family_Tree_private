@@ -1908,7 +1908,7 @@
     $('leg').innerHTML = Object.values(GEN).map(g => '<span><b style="background:' + g[2] + '"></b>' + g[0] + ' = ' + g[1] + '</span>').join('') + '<span>✝ Grey name = passed away</span><span><b style="background:#000;color:#777"></b>Black slot = couple both passed away</span>';
     const dead = (n, i) => typeof (n.dd || [])[i] === 'string';
     const BGO = ['', 'A+', 'A−', 'B+', 'B−', 'AB+', 'AB−', 'O+', 'O−'];
-    const religiousFilter = document.createElement('select'); religiousFilter.id = 'religious-filter'; religiousFilter.className = 'rel-filter'; religiousFilter.setAttribute('aria-label', 'Religious Personnel'); religiousFilter.innerHTML = '<option value="">Religious Personnel</option>'; $('.search-tools').prepend(religiousFilter);
+    const religiousFilter = document.createElement('select'); religiousFilter.id = 'religious-filter'; religiousFilter.className = 'rel-filter'; religiousFilter.setAttribute('aria-label', 'Religious Personnel'); religiousFilter.innerHTML = '<option value="">Religious Personnel</option>'; const searchTools = $('.search-tools'); if (searchTools) searchTools.prepend(religiousFilter);
     function canManagePhotos() {return role === 'admin' && !!(ME && ME.github)}
     function getPh(pid) {return Promise.resolve(ME ? (PH[pid] || ('photos/' + pid + '.jpg')) : '')}
     function pick(n, i) {
@@ -1954,7 +1954,7 @@
         img.src = previewUrl;
       }; f.click()
     }
-    function reindex() {P = new Map(); DATA.forEach(r => (function f(n, p) {P.set(n.id, {n, p}); n.kids.forEach(k => f(k, n))})(r, null)); syncReligiousPersonnel()}
+    function reindex() {P = new Map(); DATA.forEach(r => (function f(n, p) {P.set(n.id, {n, p}); n.kids.forEach(k => f(k, n))})(r, null)); try {syncReligiousPersonnel()} catch (e) {console.error('Could not refresh the Religious Personnel list:', e && e.message || 'unknown error')}}
     const cnt = n => n.kids.reduce((a, k) => a + 1 + cnt(k), 0);
     function path(id) {const a = []; let e = P.get(id); while (e && e.p) {e = P.get(e.p.id); if (e && e.n.names.length && e.p) a.unshift(e.n.names[0])} return a}
     function syncReligiousPersonnel() {
@@ -1969,7 +1969,7 @@
       select.innerHTML = '<option value="">Religious Personnel</option>' + people.map(p => '<option value="' + E(JSON.stringify([p.id, p.index])) + '">' + E(p.name + (p.line ? ' — ' + p.line : '')) + '</option>').join('');
       if (Array.from(select.options).some(o => o.value === selected)) select.value = selected
     }
-    $('religious-filter').onchange = () => {
+    const religiousSelect = $('religious-filter'); if (religiousSelect) religiousSelect.onchange = () => {
       if (!$('religious-filter').value) return;
       let target; try {target = JSON.parse($('religious-filter').value)} catch (e) {return}
       const entry = P.get(target[0]); if (!entry || !entry.n.names[target[1]]) return;
