@@ -1970,7 +1970,7 @@
       if (Array.from(select.options).some(o => o.value === selected)) select.value = selected
     }
     const religiousSelect = $('religious-filter'); if (religiousSelect) religiousSelect.onchange = () => {
-      if (!$('religious-filter').value) return;
+      if (!$('religious-filter').value) {hits = new Set(); searchMatches = []; searchIndex = -1; searchCurrent = null; st(''); render(); return}
       let target; try {target = JSON.parse($('religious-filter').value)} catch (e) {return}
       const entry = P.get(target[0]); if (!entry || !entry.n.names[target[1]]) return;
       $('q').value = ''; hits = new Set([entry.n.id]); searchMatches = [entry.n.id]; searchIndex = 0; searchCurrent = entry.n.id; showSearchMatch()
