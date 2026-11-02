@@ -673,9 +673,9 @@
       cursor: pointer
     }
 
-    .c.hit {
-      box-shadow: var(--ring), 0 0 0 6px #e53935, 0 0 18px 6px #ff7b73
-    }
+    .c.search-dim { filter: brightness(.24) saturate(.35); opacity: .38; transition: filter .18s ease, opacity .18s ease }
+    .c.hit { box-shadow: var(--ring), 0 0 0 4px #c28b32, 0 0 16px 4px rgba(255,207,103,.7) }
+    .c.hit-current { position: relative; z-index: 5; filter: brightness(1.45) saturate(1.2); box-shadow: var(--ring), 0 0 0 6px #ffe08a, 0 0 28px 9px rgba(255,214,112,.95) }
 
     .c:hover {
       z-index: 4;
@@ -1900,7 +1900,7 @@
     const PH = {}, NEWPH = {}, UPLOADED = new Set();
     let role = 'viewer', BR = [], dirtyB = [], SENT = {}, ACCESS = null, META = [], GH = {user: S('gh:user') || '', token: S('gh:token') || ''}, LIVEJ = '[]', loaded = false, undoStack = [], undoState = '', LOOSE = [];
     const historyState = () => JSON.stringify({tree: DATA, loose: LOOSE, current: cur});
-    let cur = 0, sel = null, ed = false, P = new Map(), open = new Set(), hits = new Set(), lastJ = '', tm = null;
+    let cur = 0, sel = null, ed = false, P = new Map(), open = new Set(), hits = new Set(), searchMatches = [], searchIndex = -1, searchCurrent = null, lastJ = '', tm = null;
     $('leg').innerHTML = Object.values(GEN).map(g => '<span><b style="background:' + g[2] + '"></b>' + g[0] + ' = ' + g[1] + '</span>').join('') + '<span>✝ Grey name = passed away</span><span><b style="background:#000;color:#777"></b>Black slot = couple both passed away</span>';
     const dead = (n, i) => typeof (n.dd || [])[i] === 'string';
     const BGO = ['', 'A+', 'A−', 'B+', 'B−', 'AB+', 'AB−', 'O+', 'O−'];
@@ -1955,7 +1955,7 @@
     function reorderSibling(n,delta) {const entry=P.get(n.id);if(!entry||!entry.p||!canEditNode(n))return;const siblings=entry.p.kids,from=siblings.indexOf(n),to=from+delta;if(from<0||to<0||to>=siblings.length)return;[siblings[from],siblings[to]]=[siblings[to],siblings[from]];save();render();show(n);st('Sibling order updated')}
     let IDX = 0; function node(n, vis = true) {
       const k = document.createElement('div'); k.className = 'k ' + n.c; if (vis) k.style.setProperty('--i', IDX++); const row = document.createElement('div'); row.className = 'n';
-      const c = document.createElement('div'); c.className = 'c ' + n.c + (hits.has(n.id) ? ' hit' : '') + (sel && sel.id === n.id ? ' sel' : ''); c.dataset.id = n.id;
+      const c = document.createElement('div'); c.className = 'c ' + n.c + (hits.has(n.id) ? ' hit' : (searchMatches.length ? ' search-dim' : '')) + (searchCurrent === n.id ? ' hit-current' : '') + (sel && sel.id === n.id ? ' sel' : ''); c.dataset.id = n.id;
       c.innerHTML = '<span class="av">' + E((n.names[0] || '?').trim().charAt(0)) + '</span><div class="t">' + n.names.map((x, i) => {const b = (n.bg || [])[i], d = dead(n, i); return '<div class="ln' + (d ? ' dead' : '') + '"><span>' + E(x) + (d ? '<em class="dd"> ✝' + (n.dd[i] ? ' ' + E(n.dd[i]) : '') + '</em>' : '') + '</span>' + (b ? '<b class="bd">🩸 ' + E(b) + '</b>' : (ed ? '<b class="bd e">🩸</b>' : '')) + '</div>'}).join('') + '</div>' + icons(n);
       if (n.names.length > 1 && n.names.every((x, i) => dead(n, i))) c.classList.add('dead2');
       if (ed && canEditNode(n)) {
@@ -2036,14 +2036,26 @@
     function setAll(o) {open.clear(); if (o) P.forEach(({n}, id) => {if (n.kids.length) open.add(id)}); render()}
     let sz = 1; $('sz').onclick = () => {sz = (sz + 1) % 3; document.querySelector('.wrap').className = 'wrap sz' + sz};
     $('ea').onclick = () => setAll(true); $('ca').onclick = () => setAll(false);
+    function showSearchMatch() {
+      if (searchIndex < 0 || !searchMatches.length) return;
+      const id = searchMatches[searchIndex], entry = P.get(id); if (!entry) return;
+      searchCurrent = id;
+      let e = entry; while (e && e.p) {open.add(e.p.id); e = P.get(e.p.id)}
+      if (e) cur = DATA.indexOf(e.n);
+      render(); const card = document.querySelector('.c.hit-current');
+      if (card) card.scrollIntoView({block: 'center', inline: 'center', behavior: 'smooth'});
+      st('Match ' + (searchIndex + 1) + ' of ' + searchMatches.length)
+    }
     $('q').oninput = ev => {
-      const v = ev.target.value.trim().toUpperCase(); hits = new Set();
+      const v = ev.target.value.trim().toUpperCase(); hits = new Set(); searchMatches = []; searchIndex = -1; searchCurrent = null;
       if (v.length >= 2) {
-        let first = null; P.forEach(({n}, id) => {if (n.names.join(' ').toUpperCase().includes(v)) {hits.add(id); if (first === null) first = id} });
-        hits.forEach(id => {let e = P.get(id); while (e && e.p) {open.add(e.p.id); e = P.get(e.p.id)} });
-        if (first) {let e = P.get(first); while (e.p) e = P.get(e.p.id); cur = DATA.indexOf(e.n)}
-      }
-      render(); const h = document.querySelector('.c.hit'); h && h.scrollIntoView({block: 'center', inline: 'center'})
+        P.forEach(({n}, id) => {if ((n.names || []).join(' ').toUpperCase().includes(v)) {hits.add(id); searchMatches.push(id)} });
+        if (searchMatches.length) {searchIndex = 0; showSearchMatch()} else {render(); st('No matching names')}
+      } else {render(); st('')}
+    };
+    $('q').onkeydown = ev => {
+      if (ev.key !== 'Enter' || !searchMatches.length) return;
+      ev.preventDefault(); searchIndex = (searchIndex + 1) % searchMatches.length; showSearchMatch()
     };
     function refreshBloodFilter() {
       const panel = $('bg-results'), group = $('bg-filter').value;
