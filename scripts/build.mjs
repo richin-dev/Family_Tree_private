@@ -44,6 +44,8 @@ copyHtml('site/cover.html', 'cover.html', 'dist/index.html');
 copyHtml('site/index.html', 'index.html', 'dist/tree.html');
 copyHtml('site/login.html', 'login.html', 'dist/login.html');
 fs.copyFileSync('site/pages-auth.js', 'dist/pages-auth.js');
+fs.copyFileSync('site/theme.js', 'dist/theme.js');
+fs.copyFileSync('site/theme.css', 'dist/theme.css');
 fs.copyFileSync('privacy.html', 'dist/privacy.html');
 fs.copyFileSync('site/auth-public.json', 'dist/auth-public.json');
 if (fs.existsSync('site/assets')) fs.cpSync('site/assets', 'dist/assets', { recursive: true });
