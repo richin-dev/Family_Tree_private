@@ -1,0 +1,88 @@
+/* Optional Classic Glass skin. Classic remains the default theme. */
+html[data-site-theme="classic-glass"] { color-scheme:dark; --ink:#f3f8ff; --line:#79cafa; --bar:rgba(7,18,34,.74); --bd:rgba(131,202,249,.58); }
+
+/* Family tree surfaces and people cards */
+html[data-site-theme="classic-glass"] body { color:#eff7ff; background:radial-gradient(ellipse at 16% 8%,#163958 0,transparent 42%),radial-gradient(ellipse at 88% 90%,#073c57 0,transparent 38%),linear-gradient(145deg,#071727,#081321 58%,#030a12); }
+html[data-site-theme="classic-glass"] body::after { background:radial-gradient(ellipse at 50% 40%,transparent 30%,rgba(0,8,20,.24) 100%); }
+html[data-site-theme="classic-glass"] .bar,
+html[data-site-theme="classic-glass"] .side,
+html[data-site-theme="classic-glass"] .menu-panel,
+html[data-site-theme="classic-glass"] #bg-results,
+html[data-site-theme="classic-glass"] #loose {
+  color:#f3f8ff; background:rgba(8,22,41,.66); border-color:rgba(151,207,249,.48);
+  box-shadow:0 14px 38px rgba(0,5,17,.34),inset 0 1px rgba(240,250,255,.2);
+  backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%);
+}
+html[data-site-theme="classic-glass"] .bar { border-bottom:1px solid rgba(151,207,249,.52); }
+html[data-site-theme="classic-glass"] .bar button,
+html[data-site-theme="classic-glass"] .tabs button,
+html[data-site-theme="classic-glass"] .side button,
+html[data-site-theme="classic-glass"] .menu-panel button,
+html[data-site-theme="classic-glass"] .menu-panel summary,
+html[data-site-theme="classic-glass"] #bg-results .bg-result,
+html[data-site-theme="classic-glass"] #loose button { color:#edf7ff; border-color:rgba(144,201,246,.4); }
+html[data-site-theme="classic-glass"] .menu-panel button:hover,
+html[data-site-theme="classic-glass"] .menu-panel button:focus-visible { color:#fff; background:rgba(83,162,220,.24); box-shadow:inset 3px 0 #7bd2ff; }
+html[data-site-theme="classic-glass"] .menu-panel button.on,
+html[data-site-theme="classic-glass"] .bar .on,
+html[data-site-theme="classic-glass"] .tabs button.on { color:#fff; background:rgba(55,139,194,.38); border-color:#8edbff; }
+html[data-site-theme="classic-glass"] .bar input,
+html[data-site-theme="classic-glass"] .side input,
+html[data-site-theme="classic-glass"] .search-box,
+html[data-site-theme="classic-glass"] .rel-filter,
+html[data-site-theme="classic-glass"] .bg-filter,
+html[data-site-theme="classic-glass"] .side select,
+html[data-site-theme="classic-glass"] #loose .loose-slot,
+html[data-site-theme="classic-glass"] #loose input { color:#f3f8ff; background:rgba(5,17,33,.48); border-color:rgba(127,194,239,.42); }
+html[data-site-theme="classic-glass"] .search-box { box-shadow:inset 0 1px rgba(255,255,255,.08); }
+html[data-site-theme="classic-glass"] .search-box svg { color:#9cddff; }
+html[data-site-theme="classic-glass"] .c {
+  color:#f5f9ff; text-shadow:0 1px 5px rgba(0,0,0,.42);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--b) 24%,rgba(42,68,94,.82)),rgba(7,19,36,.78));
+  border-color:color-mix(in srgb,var(--b) 72%,#c5edff);
+  box-shadow:0 12px 30px rgba(0,6,19,.32),inset 0 1px rgba(255,255,255,.23);
+  backdrop-filter:blur(16px) saturate(145%);-webkit-backdrop-filter:blur(16px) saturate(145%);
+}
+html[data-site-theme="classic-glass"] .c.hit,
+html[data-site-theme="classic-glass"] .c.hit-current { box-shadow:0 0 0 3px rgba(160,224,255,.78),0 0 26px 8px rgba(90,190,255,.56); }
+html[data-site-theme="classic-glass"] .av { color:#f2faff; background:radial-gradient(circle at 35% 30%,#6795b5,#112840 75%); box-shadow:0 0 0 3px rgba(224,245,255,.75),0 0 0 5px rgba(91,177,231,.3),0 0 18px rgba(58,166,235,.28); }
+html[data-site-theme="classic-glass"] .side h3,
+html[data-site-theme="classic-glass"] #bg-results .bg-result-head,
+html[data-site-theme="classic-glass"] #loose .loose-head,
+html[data-site-theme="classic-glass"] #st:not(:empty) { color:#e8f6ff; }
+
+/* Shared glass look on cover and sign-in pages */
+html[data-site-theme="classic-glass"] body.page-cover,
+html[data-site-theme="classic-glass"] body.page-login {
+  color:#f4f8ff; background:radial-gradient(ellipse at 15% 10%,rgba(106,178,231,.46),transparent 38%),radial-gradient(ellipse at 87% 88%,rgba(30,122,151,.36),transparent 39%),linear-gradient(145deg,#122f4b,#071626 58%,#030a12);
+}
+html[data-site-theme="classic-glass"] body.page-cover::before,
+html[data-site-theme="classic-glass"] body.page-login::before { background:linear-gradient(112deg,transparent 35%,rgba(215,241,255,.14) 48%,transparent 60%); }
+html[data-site-theme="classic-glass"] .page-cover main,
+html[data-site-theme="classic-glass"] .page-login .card {
+  border:1px solid rgba(196,230,252,.46); border-radius:28px; background:rgba(8,24,43,.48);
+  box-shadow:0 25px 80px rgba(0,0,0,.38),inset 0 1px rgba(240,250,255,.2),0 0 40px rgba(69,161,222,.12);
+  backdrop-filter:blur(22px) saturate(145%);-webkit-backdrop-filter:blur(22px) saturate(145%);
+}
+html[data-site-theme="classic-glass"] .page-cover h1,
+html[data-site-theme="classic-glass"] .page-cover .eyebrow,
+html[data-site-theme="classic-glass"] .page-cover .intro,
+html[data-site-theme="classic-glass"] .page-cover footer a,
+html[data-site-theme="classic-glass"] .page-login h1,
+html[data-site-theme="classic-glass"] .page-login p,
+html[data-site-theme="classic-glass"] .page-login label,
+html[data-site-theme="classic-glass"] .page-login .back,
+html[data-site-theme="classic-glass"] .page-login .note,
+html[data-site-theme="classic-glass"] .page-login .credit,
+html[data-site-theme="classic-glass"] .page-login .forgot { color:#f4f8ff; text-shadow:0 1px 8px rgba(0,0,0,.38); }
+html[data-site-theme="classic-glass"] .page-login input { min-height:52px; padding:13px 15px; border-radius:14px; color:#fff; background:rgba(255,255,255,.11); border:1px solid rgba(220,241,255,.64); backdrop-filter:blur(12px); }
+html[data-site-theme="classic-glass"] .page-login input::placeholder { color:rgba(255,255,255,.72); }
+html[data-site-theme="classic-glass"] .page-login .go,
+html[data-site-theme="classic-glass"] .page-cover .explore { color:#fff; background:linear-gradient(125deg,rgba(88,175,229,.9),rgba(28,105,165,.92)); border:1px solid rgba(227,246,255,.78); box-shadow:0 10px 32px rgba(11,74,122,.34); }
+html[data-site-theme="classic-glass"] .page-login .credit { border-color:rgba(220,241,255,.33); }
+html[data-site-theme="classic-glass"] .page-cover .logo-image { box-shadow:0 0 48px rgba(112,205,255,.2),0 18px 50px rgba(0,0,0,.4); }
+
+/* Short, bright particles on selection. A separate canvas keeps the effect
+   above cards without intercepting clicks or changing tree layout. */
+.slot-particle-canvas { position:fixed; inset:0; z-index:30; width:100%; height:100%; pointer-events:none; }
+@media(prefers-reduced-motion:reduce) { .slot-particle-canvas { display:none; } }
