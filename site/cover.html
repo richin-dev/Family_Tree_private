@@ -11,12 +11,12 @@
     :root{color-scheme:dark;--gold:#e7c47c;--muted:#c9c3b4;--blue:#69d8ee}
     *{box-sizing:border-box}
     html,body{min-height:100%;margin:0}
-    body{min-height:100svh;display:grid;place-items:center;overflow:hidden;padding:28px;color:#f6f0e3;background:radial-gradient(ellipse at 50% 42%,#14272b 0,#091417 42%,#030708 100%);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{min-height:100svh;display:grid;place-items:center;overflow-x:hidden;overflow-y:auto;padding:28px;color:#f6f0e3;background:radial-gradient(ellipse at 50% 42%,#14272b 0,#091417 42%,#030708 100%);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
     body::before,body::after{content:"";position:fixed;inset:-30%;pointer-events:none}
     body::before{background:linear-gradient(112deg,transparent 36%,rgba(113,203,219,.08) 43%,transparent 50%),linear-gradient(72deg,transparent 48%,rgba(222,187,111,.055) 55%,transparent 62%);animation:lights 16s ease-in-out infinite alternate}
     body::after{inset:0;opacity:.45;background-image:radial-gradient(1px 1px at 12% 22%,#e9d9ad 99%,transparent),radial-gradient(1px 1px at 77% 18%,#b8dce2 99%,transparent),radial-gradient(2px 2px at 86% 72%,#e9d9ad 99%,transparent),radial-gradient(1px 1px at 20% 80%,#b8dce2 99%,transparent);background-size:370px 310px;animation:stars 24s linear infinite}
-    main{position:relative;z-index:1;width:min(680px,100%);padding:30px 24px 54px;text-align:center}
-    .mark{position:relative;width:clamp(240px,44vw,390px);aspect-ratio:1;margin:0 auto 24px;display:grid;place-items:center;animation:arrive 1.1s cubic-bezier(.2,.8,.2,1) both}
+    main{position:relative;z-index:1;width:min(680px,100%);padding:24px 24px 54px;text-align:center}
+    .mark{position:relative;width:clamp(170px,30vh,300px);aspect-ratio:1;margin:0 auto 18px;display:grid;place-items:center;animation:arrive 1.1s cubic-bezier(.2,.8,.2,1) both}
     .logo-image{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;box-shadow:0 0 48px rgba(105,216,238,.14),0 18px 50px rgba(0,0,0,.36);animation:logo-float 5s ease-in-out 1.1s infinite alternate}
     .eyebrow{margin:0 0 10px;color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;animation:fade-up .8s .15s both}
     h1{margin:0;color:#f0d9a0;font:700 clamp(30px,7vw,48px)/1.1 Cinzel,Georgia,"Times New Roman",serif;letter-spacing:.045em;text-shadow:0 3px 25px rgba(231,196,124,.18);animation:fade-up .8s .25s both}
@@ -25,6 +25,21 @@
     .explore:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(210,166,78,.34)}
     .explore:focus-visible{outline:3px solid var(--blue);outline-offset:5px}
     .arrow{font:22px/1 system-ui;transition:transform .2s}.explore:hover .arrow{transform:translateX(4px)}
+    .video-carousel{width:min(100%,520px);margin:0 auto 22px;text-align:left;animation:fade-up .8s .44s both}
+    .video-frame{position:relative;overflow:hidden;aspect-ratio:16/9;border:1px solid rgba(231,196,124,.48);border-radius:18px;background:linear-gradient(140deg,rgba(37,69,74,.72),rgba(7,15,18,.92));box-shadow:0 18px 45px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.12)}
+    .video-slide{position:absolute;inset:0}
+    .video-frame video{display:block;width:100%;height:100%;object-fit:contain;background:rgba(0,0,0,.24)}
+    .video-placeholder{position:absolute;inset:0;display:grid;place-content:center;gap:8px;padding:20px;text-align:center;color:#f0d9a0;background:radial-gradient(ellipse at 50% 35%,rgba(105,216,238,.13),transparent 55%)}
+    .video-placeholder[hidden]{display:none}
+    .video-placeholder .play-mark{margin:auto;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(240,217,160,.64);border-radius:50%;font-size:17px;color:var(--blue);background:rgba(255,255,255,.06)}
+    .video-placeholder strong{font:700 13px Cinzel,Georgia,serif;letter-spacing:.08em;text-transform:uppercase}
+    .video-placeholder span{font-size:12px;color:var(--muted)}
+    .video-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px}
+    .video-controls button{width:34px;height:30px;border:1px solid rgba(231,196,124,.46);border-radius:999px;color:#f0d9a0;background:rgba(255,255,255,.055);font:16px/1 system-ui;cursor:pointer}
+    .video-controls button:hover,.video-controls button:focus-visible{background:rgba(231,196,124,.18);outline:2px solid var(--blue);outline-offset:2px}
+    .video-dots{display:flex;align-items:center;gap:8px}
+    .video-dots button{width:9px;height:9px;padding:0;border:0;border-radius:50%;background:rgba(240,217,160,.4)}
+    .video-dots button[aria-current="true"]{width:22px;border-radius:9px;background:var(--gold)}
     footer{position:fixed;z-index:2;bottom:14px;left:0;right:0;text-align:center;font-size:12px}
     footer a{color:#c9b787;text-decoration:underline;text-underline-offset:3px;opacity:.75}
     @keyframes lights{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
@@ -33,7 +48,7 @@
     @keyframes arrive{from{opacity:0;transform:translateY(18px) scale(.92)}to{opacity:1;transform:none}}
     @keyframes fade-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}}
-    @media(max-height:700px){main{padding-top:8px;padding-bottom:30px}.mark{width:clamp(180px,42vh,280px);margin-bottom:12px}.intro{margin:12px auto 20px}}
+    @media(max-height:700px){main{padding-top:8px;padding-bottom:30px}.mark{width:clamp(150px,25vh,210px);margin-bottom:10px}.intro{margin:10px auto 16px}.video-carousel{width:min(100%,420px);margin-bottom:16px}}
   </style>
 </head>
 <body class="page-cover">
@@ -42,8 +57,52 @@
     <p class="eyebrow">A story through generations</p>
     <h1>Our Family Story</h1>
     <p class="intro">Explore the people and connections that bring our family together.</p>
+    <section class="video-carousel" aria-label="Family videos">
+      <div class="video-frame" aria-live="polite">
+        <div class="video-slide" data-video-slide="0">
+          <video playsinline preload="none" aria-label="Family video 1"><!-- Add a source later: <source src="assets/welcome-video-1.mp4" type="video/mp4"> --></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Video 1 will appear here</span></div>
+        </div>
+        <div class="video-slide" data-video-slide="1" hidden>
+          <video playsinline preload="none" aria-label="Family video 2"><!-- Add a source later: <source src="assets/welcome-video-2.mp4" type="video/mp4"> --></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>More family memories</strong><span>Video 2 will appear here</span></div>
+        </div>
+      </div>
+      <div class="video-controls" aria-label="Video carousel controls">
+        <button type="button" data-video-prev aria-label="Previous video">‹</button>
+        <div class="video-dots" role="group" aria-label="Choose a video">
+          <button type="button" data-video-dot="0" aria-label="Show video 1" aria-current="true"></button>
+          <button type="button" data-video-dot="1" aria-label="Show video 2" aria-current="false"></button>
+        </div>
+        <button type="button" data-video-next aria-label="Next video">›</button>
+      </div>
+    </section>
     <a class="explore" href="tree.html"><span>Explore</span><span class="arrow" aria-hidden="true">→</span></a>
   </main>
   <footer><a href="privacy.html">Privacy</a></footer>
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('[data-video-slide]')];
+      const dots = [...document.querySelectorAll('[data-video-dot]')];
+      let current = 0;
+      function show(index) {
+        current = (index + slides.length) % slides.length;
+        slides.forEach((slide, i) => {
+          slide.hidden = i !== current;
+          const video = slide.querySelector('video');
+          if (i !== current) video.pause();
+          const placeholder = slide.querySelector('.video-placeholder');
+          const hasVideo = Boolean(video.querySelector('source[src]') || video.getAttribute('src'));
+          video.controls = hasVideo;
+          placeholder.hidden = hasVideo;
+        });
+        dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === current)));
+      }
+      document.querySelector('[data-video-prev]').addEventListener('click', () => show(current - 1));
+      document.querySelector('[data-video-next]').addEventListener('click', () => show(current + 1));
+      dots.forEach(dot => dot.addEventListener('click', () => show(Number(dot.dataset.videoDot))));
+      show(0);
+    })();
+  </script>
 </body>
 </html>
