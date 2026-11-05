@@ -19,6 +19,7 @@ function photoState(tree) {
       n.ph.forEach(id => { if (id) ids.add(id); });
     }
     if (Array.isArray(n.kids)) n.kids.forEach(walk);
+    if (Array.isArray(n.spouseBranches)) n.spouseBranches.forEach(branch => (branch.kids || []).forEach(walk));
   };
   if (!Array.isArray(tree)) throw new Error('Invalid family tree.');
   tree.forEach(walk);

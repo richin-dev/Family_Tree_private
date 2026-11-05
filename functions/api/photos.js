@@ -52,7 +52,7 @@ async function isReferenced(ctx, id) {
     if (row) {
       try {
         let found = false;
-        const walk = n => { if (!n || found) return; if (Array.isArray(n.ph) && n.ph.includes(id)) found = true; (n.kids || []).forEach(walk); };
+        const walk = n => { if (!n || found) return; if (Array.isArray(n.ph) && n.ph.includes(id)) found = true; (n.kids || []).forEach(walk); (n.spouseBranches || []).forEach(branch => (branch.kids || []).forEach(walk)); };
         JSON.parse(row.payload).tree.forEach(walk);
         return found;
       } catch { return true; }
@@ -62,7 +62,7 @@ async function isReferenced(ctx, id) {
   if (!response.ok) return false;
   try {
     let found = false;
-    const walk = n => { if (!n || found) return; if (Array.isArray(n.ph) && n.ph.includes(id)) found = true; (n.kids || []).forEach(walk); };
+    const walk = n => { if (!n || found) return; if (Array.isArray(n.ph) && n.ph.includes(id)) found = true; (n.kids || []).forEach(walk); (n.spouseBranches || []).forEach(branch => (branch.kids || []).forEach(walk)); };
     (await response.json()).tree.forEach(walk);
     return found;
   } catch { return false; }

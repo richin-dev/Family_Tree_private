@@ -59,6 +59,7 @@ function photoFieldsChanged(oldRoot, newRoot) {
       if (!n || typeof n !== 'object') return;
       if (typeof n.id === 'string') m.set(n.id, JSON.stringify(n.ph === undefined ? null : n.ph));
       if (Array.isArray(n.kids)) n.kids.forEach(walk);
+      if (Array.isArray(n.spouseBranches)) n.spouseBranches.forEach(branch => (branch.kids || []).forEach(walk));
     };
     walk(root);
     return m;
