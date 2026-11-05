@@ -2239,7 +2239,7 @@
         if (particles.length) {running = true; requestAnimationFrame(draw)}
       }
       window.slotParticles = target => {
-        if (reduceMotion || document.documentElement.dataset.siteTheme !== 'classic-glass') return;
+        if (reduceMotion) return;
         const rect = target.getBoundingClientRect(), color = getComputedStyle(target).getPropertyValue('--b').trim() || '#9fe5ff';
         const count = 22;
         for (let i = 0; i < count; i++) {
