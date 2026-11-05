@@ -257,13 +257,6 @@
 
     #banners .plate .root-edit { display: block; margin: 6px auto 0; padding: 3px 8px; border: 1px solid rgba(240,217,160,.55); border-radius: 6px; background: rgba(12,13,17,.72); color: #f0d9a0; font: 600 10px var(--ff); cursor: pointer }
     #banners .plate .root-edit:hover { background: linear-gradient(#b8893f, #7c5619); color: #fff }
-    .spouse-family { position:relative; z-index:2; margin:22px 10px 12px; padding:12px 14px 16px; border:1px solid rgba(200,164,92,.5); border-radius:12px; background:rgba(18,24,30,.62); box-shadow:0 10px 28px rgba(0,0,0,.24); backdrop-filter:blur(10px) }
-    .spouse-family-title { margin:0 0 8px; color:#f0d9a0; font:700 13px var(--ff); letter-spacing:.04em }
-    .spouse-family-empty { padding:8px 4px; color:var(--ink); opacity:.72; font-size:12px }
-    .spouse-edit-row { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:6px; align-items:center; margin:5px 0 }
-    .spouse-edit-row input { min-width:0; padding:7px 9px; border:1px solid var(--bd); border-radius:7px; background:#120e09; color:var(--ink) }
-    .spouse-edit-row button { padding:6px 8px; border:1px solid #b8893f; border-radius:7px; background:#21190f; color:#f0d9a0; cursor:pointer }
-    @media(max-width:560px) { .spouse-edit-row { grid-template-columns:minmax(0,1fr) auto } .spouse-edit-row .spouse-remove { grid-column:2; grid-row:2 } }
 
     .pi {
       display: block;
@@ -1982,9 +1975,9 @@
         img.src = previewUrl;
       }; f.click()
     }
-    function reindex() {P = new Map(); DATA.forEach(r => {P.set(r.id,{n:r,p:null});const walk=(n,p,list,spouseName)=>{P.set(n.id,{n,p,list,spouseName});n.kids.forEach(k=>walk(k,n,n.kids,spouseName))};r.kids.forEach(k=>walk(k,r,r.kids,''));(r.spouseBranches||[]).forEach(branch=>branch.kids.forEach(k=>walk(k,r,branch.kids,branch.name)))}); try {syncReligiousPersonnel()} catch (e) {console.error('Could not refresh the Religious Personnel list:', e && e.message || 'unknown error')}}
+    function reindex() {P = new Map(); DATA.forEach(r => (function f(n, p) {P.set(n.id, {n, p}); n.kids.forEach(k => f(k, n))})(r, null)); try {syncReligiousPersonnel()} catch (e) {console.error('Could not refresh the Religious Personnel list:', e && e.message || 'unknown error')}}
     const cnt = n => n.kids.reduce((a, k) => a + 1 + cnt(k), 0);
-    function path(id) {const a = []; let e = P.get(id); if(e&&e.spouseName)a.push(e.spouseName); while (e && e.p) {e = P.get(e.p.id); if (e && e.n.names.length && e.p) a.unshift(e.n.names[0])} return a}
+    function path(id) {const a = []; let e = P.get(id); while (e && e.p) {e = P.get(e.p.id); if (e && e.n.names.length && e.p) a.unshift(e.n.names[0])} return a}
     function syncReligiousPersonnel() {
       const select = $('religious-filter'); if (!select) return;
       const selected = select.value, people = [];
@@ -2003,7 +1996,7 @@
       const entry = P.get(target[0]); if (!entry || !entry.n.names[target[1]]) return;
       $('q').value = ''; hits = new Set([entry.n.id]); searchMatches = [entry.n.id]; searchIndex = 0; searchCurrent = entry.n.id; showSearchMatch()
     };
-    function reorderSibling(n,delta) {const entry=P.get(n.id);if(!entry||!entry.p||!canEditNode(n))return;const siblings=entry.list||entry.p.kids,from=siblings.indexOf(n),to=from+delta;if(from<0||to<0||to>=siblings.length)return;[siblings[from],siblings[to]]=[siblings[to],siblings[from]];save();render();show(n);st('Sibling order updated')}
+    function reorderSibling(n,delta) {const entry=P.get(n.id);if(!entry||!entry.p||!canEditNode(n))return;const siblings=entry.p.kids,from=siblings.indexOf(n),to=from+delta;if(from<0||to<0||to>=siblings.length)return;[siblings[from],siblings[to]]=[siblings[to],siblings[from]];save();render();show(n);st('Sibling order updated')}
     let IDX = 0; function node(n, vis = true) {
       const k = document.createElement('div'); k.className = 'k ' + n.c; if (vis) k.style.setProperty('--i', IDX++); const row = document.createElement('div'); row.className = 'n';
       const c = document.createElement('div'); c.className = 'c ' + n.c + (hits.has(n.id) ? ' hit' : (searchMatches.length ? ' search-dim' : '')) + (searchCurrent === n.id ? ' hit-current' : '') + (sel && sel.id === n.id ? ' sel' : ''); c.dataset.id = n.id;
@@ -2054,7 +2047,7 @@
       if(containsId(entry.n,target.id)){st('A person cannot be moved under themselves or their descendant');return}
       if(entry.p.id===target.id){st('This person is already under that parent');return}
       if(visibleDepth(target)+subtreeHeight(entry.n)>9){st('That move would make the family line too deep');return}
-      const sourceList=entry.list||entry.p.kids,at=sourceList.indexOf(entry.n);if(at<0)return;sourceList.splice(at,1);target.kids.push(entry.n);
+      const at=entry.p.kids.indexOf(entry.n);if(at<0)return;entry.p.kids.splice(at,1);target.kids.push(entry.n);
       recolorSubtree(entry.n,generationIndex(target)+1);cur=targetBranch;open.add(target.id);ch(entry.n);st('Moved the person and their descendants; generation colours were updated')
     }
     function attachLoose(id,target) {
@@ -2067,20 +2060,12 @@
     function render() {
       $('pop').style.display = 'none'; const w = $('wrap'), sx = w.scrollLeft, sy = window.scrollY; banners(); renderLoose(); const t = $('tree'); t.innerHTML = ''; IDX = 0; if (!DATA.length) {t.innerHTML = '<div class="m" style="padding:30px 6px">Loading the family tree…</div>'; return } const r = DATA[cur];
       const h = document.createElement('div'); h.className = 'kids top'; h.style.margin = '0'; r.kids.forEach(x => h.appendChild(node(x, true))); t.appendChild(h);
-      (r.spouseBranches || []).forEach(branch => {
-        const family = document.createElement('section'); family.className = 'spouse-family';
-        const title = document.createElement('h3'); title.className = 'spouse-family-title'; title.textContent = r.names[0] + ' + ' + branch.name + ' · separate children branch';
-        family.appendChild(title);
-        if (!branch.kids.length) {const empty = document.createElement('div'); empty.className = 'spouse-family-empty'; empty.textContent = 'No children added to this spouse branch yet.'; family.appendChild(empty)}
-        else {const children = document.createElement('div'); children.className = 'kids top'; children.style.margin = '0'; branch.kids.forEach(child => children.appendChild(node(child,true))); family.appendChild(children)}
-        t.appendChild(family)
-      });
       STEP = Math.max(14, Math.min(60, 2400 / Math.max(IDX, 1))); t.style.setProperty('--st', STEP + 'ms'); w.scrollLeft = sx; window.scrollTo(window.scrollX, sy); place()
     }
     function banners() {
       const b = $('banners'); b.innerHTML = ''; DATA.forEach((r, i) => {
         const p = document.createElement('div'); p.className = 'plate' + (i === cur ? ' on' : '');
-        p.innerHTML = '<div class="p1">' + E(r.names[0]) + '</div><div class="p2">' + E(r.names[1] || '') + '</div>' + (ed && canEditNode(r) ? '<button class="root-edit" type="button">✎ Edit family</button>' : '');
+        p.innerHTML = '<div class="p1">' + E(r.names[0]) + '</div><div class="p2">' + E(r.names.slice(1).join(' · ')) + '</div>' + (ed && canEditNode(r) ? '<button class="root-edit" type="button">✎ Edit family</button>' : '');
         const edit = p.querySelector('.root-edit'); if (edit) edit.onclick = ev => {ev.stopPropagation(); if (i !== cur) cur = i; render(); show(r)};
         if (i !== cur) {p.title = 'Open this branch'; p.onclick = () => {cur = i; render(); hide(); window.warp && warp(); enter(); const on = document.querySelector('#banners .plate.on'); on && on.scrollIntoView({inline: 'center', block: 'nearest'}); place()}}
         b.appendChild(p)
@@ -2156,11 +2141,10 @@
         h += contact(n) + (bloodMatch ? (n.tel ? '<div class="m">This contact number is recorded for this family slot.</div>' : '<div class="m">No contact number is recorded for this family slot.</div>') : ''); const l = n.link || LINKS[n.names[0]] || ''; h += /^https?:/.test(l) ? '<div class="m"><a href="' + E(l) + '" target="_blank" rel="noopener">Open link</a></div>' : (ed && !canEditNode(n) ? '<div class="warn">You can edit only your assigned branches (' + E(BR.map(b => DATA[b] ? DATA[b].names[0] : '').join(', ')) + ').</div>' : '<div class="m">Tap ✏️ Edit to rename people, add a link, phone, address, blood group, or family members.</div>')
       }
       else {
-        const spouseEditor = rootNode ? '<div class="m">Additional spouses · each spouse has a separate children branch</div><div id="spouse-list">' + (n.spouseBranches || []).map(branch => '<div class="spouse-edit-row"><input data-spouse-name="' + E(branch.id) + '" value="' + E(branch.name) + '" aria-label="Additional spouse name"><button type="button" data-spouse-add-child="' + E(branch.id) + '">+ Add child</button><button type="button" class="spouse-remove dn" data-spouse-remove="' + E(branch.id) + '">Remove branch</button></div>').join('') + '</div><button type="button" id="as">+ Add spouse branch</button>' : '';
-        const spouseButton = rootNode ? '' : '<button id="an">+ Spouse / name line</button>';
+        const spouseButton = rootNode ? (n.names.length < 3 ? '<button type="button" id="ar">+ Add spouse to this slot</button>' : '') : '<button id="an">+ Spouse / name line</button>';
         const categoryField = rootNode ? '' : '<div class="m">Category</div><select id="cat">' + Object.keys(GEN).map(k => '<option value="' + k + '"' + (k === n.c ? ' selected' : '') + '>' + GEN[k][0] + ' — ' + GEN[k][1] + '</option>').join('') + '</select>';
         h += '<h3>' + (rootNode ? 'Edit main family' : 'Edit member') + '</h3>' + n.names.map((x, i) => '<div class="pp"><div class="r"><input class="nm" data-i="' + i + '" value="' + E(x) + '" placeholder="' + (i ? 'Spouse / partner' : 'Name') + '"><select class="bgs" data-i="' + i + '" title="Blood group">' + BGO.map(g => '<option value="' + g + '"' + (g === ((n.bg || [])[i] || '') ? ' selected' : '') + '>' + (g ? '🩸 ' + g : '🩸 —') + '</option>').join('') + '</select>' + (n.names.length > 1 ? '<button data-rm="' + i + '">×</button>' : '') + '</div><div class="r"><label class="ck"><input type="checkbox" class="dc" data-i="' + i + '"' + (dead(n, i) ? ' checked' : '') + '> ✝ Passed away</label><input class="dt" data-i="' + i + '" placeholder="Year or date" value="' + E(dead(n, i) ? (n.dd[i] || '') : '') + '"' + (dead(n, i) ? '' : ' disabled') + '></div>' + (canManagePhotos() ? '<div class="r"><button class="up" data-i="' + i + '">📷 ' + ((n.ph || [])[i] ? 'Change' : 'Add') + ' photo</button>' + ((n.ph || [])[i] ? '<button class="rp" data-i="' + i + '">Remove</button><img class="th" alt="" data-pid="' + n.ph[i] + '">' : '') + '</div>' : ((n.ph || [])[i] ? '<img class="th" alt="" data-pid="' + n.ph[i] + '">' : '')) + '</div>').join('')
-        + spouseEditor + spouseButton + categoryField + '<div class="m">Link</div><input id="lk" value="' + E(n.link || '') + '" placeholder="https://… (photo, profile, document)"><div class="m">📞 Phone number</div><input id="tel" type="tel" value="' + E(n.tel || '') + '" placeholder="+91 …"><div class="m">📍 Address</div><textarea id="addr" rows="2" placeholder="House, street, town">' + E(n.addr || '') + '</textarea><div class="r"><button id="ac">+ Add child</button>' + (rootNode ? '' : '<button id="dl" class="dn">Delete</button>') + '</div>'
+        + spouseButton + categoryField + '<div class="m">Link</div><input id="lk" value="' + E(n.link || '') + '" placeholder="https://… (photo, profile, document)"><div class="m">📞 Phone number</div><input id="tel" type="tel" value="' + E(n.tel || '') + '" placeholder="+91 …"><div class="m">📍 Address</div><textarea id="addr" rows="2" placeholder="House, street, town">' + E(n.addr || '') + '</textarea><div class="r"><button id="ac">+ Add child</button>' + (rootNode ? '' : '<button id="dl" class="dn">Delete</button>') + '</div>'
       }
       s.innerHTML = h; s.style.display = 'block';
       if (NOCONTACT) s.querySelectorAll('#tel,#addr,.bgs').forEach(e => {const p = e.previousElementSibling; e.style.display = 'none'; if (p && p.classList.contains('m')) p.style.display = 'none'});
@@ -2173,15 +2157,12 @@
       s.querySelectorAll('.up').forEach(b => b.onclick = () => pick(n, +b.dataset.i));
       s.querySelectorAll('.rp').forEach(b => b.onclick = () => {n.ph[+b.dataset.i] = null; ch(n)});
       s.querySelectorAll('img.th').forEach(im => getPh(im.dataset.pid).then(u => {if (u) im.src = u}));
-      s.querySelectorAll('[data-spouse-name]').forEach(input => input.onchange = () => {const branch=(n.spouseBranches||[]).find(x=>x.id===input.dataset.spouseName);if(branch){branch.name=input.value.trim()||'NEW SPOUSE';ch(n)}});
-      s.querySelectorAll('[data-spouse-add-child]').forEach(button => button.onclick = () => {const branch=(n.spouseBranches||[]).find(x=>x.id===button.dataset.spouseAddChild);if(!branch)return;const child=mk(['NEW PERSON'],(n.kids[0]&&n.kids[0].c)||'blue');branch.kids.push(child);cur=DATA.indexOf(n);reindex();save();render();show(child);const input=document.querySelector('.nm');input&&input.select()});
-      s.querySelectorAll('[data-spouse-remove]').forEach(button => button.onclick = () => {const branch=(n.spouseBranches||[]).find(x=>x.id===button.dataset.spouseRemove);if(!branch)return;if(branch.kids.length&&!confirm('Remove this spouse and their entire separate children branch?'))return;n.spouseBranches=n.spouseBranches.filter(x=>x.id!==branch.id);if(!n.spouseBranches.length)delete n.spouseBranches;ch(n)});
-      const addSpouse=$('as');if(addSpouse)addSpouse.onclick=()=>{n.spouseBranches=n.spouseBranches||[];if(n.spouseBranches.length>=5){st('A main family can have up to five additional spouse branches');return}n.spouseBranches.push({id:mk([],'blue').id,name:'NEW SPOUSE',kids:[]});ch(n);const inputs=s.querySelectorAll('[data-spouse-name]');const last=inputs[inputs.length-1];if(last){last.focus();last.select()}};
+      const addRootSpouse=$('ar');if(addRootSpouse)addRootSpouse.onclick=()=>{if(n.names.length>=3)return;n.names.push('NEW SPOUSE');ch(n);const inputs=s.querySelectorAll('.nm'),last=inputs[inputs.length-1];if(last){last.focus();last.select()}};
       const spouseAdd = $('an'); if (spouseAdd) spouseAdd.onclick = () => {n.names.push('NEW NAME'); ch(n)};
       const category = $('cat'); if (category) category.onchange = ev => {n.c = ev.target.value; ch(n)};
       $('lk').onchange = ev => {n.link = ev.target.value.trim(); ch(n)}; $('tel').onchange = ev => {n.tel = ev.target.value.trim(); ch(n)}; $('addr').onchange = ev => {n.addr = ev.target.value.trim(); ch(n)};
       $('ac').onclick = () => {const k = mk(['NEW PERSON'], RK[Math.min(generationIndex(n) + 1, RK.length - 1)]); n.kids.push(k); open.add(n.id); reindex(); save(); render(); show(k); const i = document.querySelector('.nm'); i && i.select()};
-      const del = $('dl'); if (del) del.onclick = function () {if (this.dataset.s !== '1') {this.dataset.s = '1'; this.textContent = 'Tap again to confirm'; return } const pe = P.get(n.id),siblings=pe.list||pe.p.kids; siblings.splice(siblings.indexOf(n), 1); sel = null; reindex(); save(); render(); hide()}
+      const del = $('dl'); if (del) del.onclick = function () {if (this.dataset.s !== '1') {this.dataset.s = '1'; this.textContent = 'Tap again to confirm'; return } const pe = P.get(n.id); pe.p.kids.splice(pe.p.kids.indexOf(n), 1); sel = null; reindex(); save(); render(); hide()}
     }
     let hov = null; const pop = $('pop');
     $('tree').addEventListener('mouseover', e => {
@@ -2282,12 +2263,11 @@
     const REPO = () => {const r = (ACCESS && ACCESS.repo) || ''; return /^[\w.-]+\/[\w.-]+$/.test(r) && !r.startsWith('YOUR_') ? r : ''};
     function icons(n) {const a = ((n.link || LINKS[n.names[0]]) ? '🔗' : '') + ((n.ph || []).some(Boolean) ? '📷' : '') + (n.tel ? '📞' : '') + (n.addr ? '📍' : ''); return a ? '<i>' + a + '</i>' : ''}
     function contact(n) {return (n.tel ? '<div class="m">📞 <a href="tel:' + E(String(n.tel).replace(/[^\d+]/g, '')) + '">' + E(n.tel) + '</a></div>' : '') + (n.addr ? '<div class="m">📍 ' + E(n.addr) + ' · <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(n.addr) + '">Map</a></div>' : '')}
-    function flat(root) {const m = new Map();(function f(n,pn){n.kids.forEach(k=>{m.set(k.id,{n:k,p:pn});f(k,k)})})(root,root);(root.spouseBranches||[]).forEach(branch=>branch.kids.forEach(k=>{m.set(k.id,{n:k,p:root});(function f(n){n.kids.forEach(child=>{m.set(child.id,{n:child,p:n});f(child)})})(k)}));return m}
+    function flat(root) {const m = new Map(); (function f(n, pn) {n.kids.forEach(k => {m.set(k.id, {n: k, p: pn}); f(k, k)})})(root, root); return m}
     const lab = n => n.names.join(' & ');
-    function orderMap(root) {const m=new Map();(function walk(n){m.set(n.id,{ids:n.kids.map(k=>k.id),name:lab(n)});n.kids.forEach(walk)})(root);(root.spouseBranches||[]).forEach(branch=>{m.set(branch.id,{ids:branch.kids.map(k=>k.id),name:(root.names[0]||'Family')+' + '+branch.name});branch.kids.forEach(walk)});return m}
+    function orderMap(root) {const m=new Map();(function walk(n){m.set(n.id,{ids:n.kids.map(k=>k.id),name:lab(n)});n.kids.forEach(walk)})(root);return m}
     function diff(a, b) {
       const A=flat(a),B=flat(b),OA=orderMap(a),OB=orderMap(b),o=[];
-      const spousesA=(a.spouseBranches||[]).map(branch=>branch.name),spousesB=(b.spouseBranches||[]).map(branch=>branch.name);if(JSON.stringify(spousesA)!==JSON.stringify(spousesB))o.push('✏️ Additional spouse branches: '+(spousesB.join(', ')||'none'));
       B.forEach(({n,p},id)=>{const x=A.get(id);if(!x)o.push('➕ '+lab(n)+'  (under '+lab(p)+')');else{const y=x.n;if(lab(y)!==lab(n))o.push('✏️ '+lab(y)+' → '+lab(n));const c=[];[['c','colour'],['tel','phone'],['addr','address'],['link','link']].forEach(([k,l])=>{if((y[k]||'')!==(n[k]||''))c.push(l)});[['bg','blood group'],['dd','passed away'],['ph','photo']].forEach(([k,l])=>{if(JSON.stringify(y[k]||[])!==JSON.stringify(n[k]||[]))c.push(l)});if(c.length)o.push('✏️ '+lab(n)+': '+c.join(', ')+' changed')}});
       A.forEach(({n},id)=>{if(!B.has(id))o.push('➖ '+lab(n)+' removed')});
       OB.forEach((after,id)=>{const before=OA.get(id);if(before&&before.ids.length===after.ids.length&&before.ids.every(child=>after.ids.includes(child))&&before.ids.some((child,i)=>child!==after.ids[i]))o.push('↕ Reordered children under '+before.name)});
@@ -2365,9 +2345,9 @@
       })
     }
     /* ---- send changes as a pull request ---- */
-    const branchJson = b => JSON.stringify({id: DATA[b].id, names: DATA[b].names, kids: DATA[b].kids, ...(DATA[b].spouseBranches&&DATA[b].spouseBranches.length?{spouseBranches:DATA[b].spouseBranches}:{})}, null, 2) + '\n';
+    const branchJson = b => JSON.stringify({id: DATA[b].id, names: DATA[b].names, kids: DATA[b].kids}, null, 2) + '\n';
     const b64 = s => btoa(unescape(encodeURIComponent(s)));
-    function newPhotos(bs) {const o = {}; bs.forEach(b => (function f(n) {(n.ph || []).forEach(p => {if (p && NEWPH[p]) o[p] = NEWPH[p]}); n.kids.forEach(f);(n.spouseBranches||[]).forEach(branch=>branch.kids.forEach(f))})(DATA[b])); return o}
+    function newPhotos(bs) {const o = {}; bs.forEach(b => (function f(n) {(n.ph || []).forEach(p => {if (p && NEWPH[p]) o[p] = NEWPH[p]}); n.kids.forEach(f)})(DATA[b])); return o}
     async function createPR(bs, note) {
       const repo = REPO(), L = JSON.parse(LIVEJ), ph = newPhotos(bs);
       const base = (await ghApi('/repos/' + repo + '/git/ref/heads/main')).object.sha, name = 'edit/' + GH.user.toLowerCase() + '-' + Date.now().toString(36);

@@ -7,13 +7,11 @@ const NODE_KEYS = new Set(['id','names','c','kids','bg','dd','ph','link','tel','
 export function checkBranch(root, where, errs, ids, photoExists) {
   const e = (m) => errs.push(`${where}: ${m}`);
   if (!root || typeof root !== 'object' || Array.isArray(root)) return e('must be a JSON object');
-  const extra = Object.keys(root).filter(k => !['id','names','kids','spouseBranches'].includes(k));
+  const extra = Object.keys(root).filter(k => !['id','names','kids'].includes(k));
   if (extra.length) e(`unknown root field(s): ${extra.join(', ')}`);
   if (typeof root.id !== 'string' || !ID.test(root.id)) e('root id is missing or invalid');
-  if (!Array.isArray(root.names) || root.names.length < 1 || root.names.length > 2 || root.names.some(s => typeof s !== 'string' || !s.length || s.length > 80 || CTRL.test(s))) e('root names must be 1-2 short strings');
+  if (!Array.isArray(root.names) || root.names.length < 1 || root.names.length > 3 || root.names.some(s => typeof s !== 'string' || !s.trim().length || s.length > 80 || CTRL.test(s))) e('root names must be 1-3 short strings');
   if (!Array.isArray(root.kids)) return e('root kids must be a list');
-  if (typeof root.id === 'string' && ids.has(root.id)) e(`duplicate id "${root.id}"`);
-  else if (typeof root.id === 'string' && ID.test(root.id)) ids.add(root.id);
   let count = 0;
   const walk = (n, path, depth) => {
     if (++count > 600) { if (count === 601) e('too many people in one branch (limit 600)'); return; }
@@ -42,29 +40,13 @@ export function checkBranch(root, where, errs, ids, photoExists) {
     }
   };
   root.kids.forEach((k, i) => walk(k, `${(root.names && root.names[0]) || 'root'} › ${(k && Array.isArray(k.names) && k.names[0]) || i}`, 1));
-  if (root.spouseBranches !== undefined) {
-    if (!Array.isArray(root.spouseBranches) || root.spouseBranches.length > 5) e('spouseBranches must be a list of at most 5 extra spouse branches');
-    else root.spouseBranches.forEach((branch, i) => {
-      const path = `${(root.names && root.names[0]) || 'root'} + spouse ${i + 1}`;
-      if (!branch || typeof branch !== 'object' || Array.isArray(branch)) return e(`${path}: must be an object`);
-      const unknown = Object.keys(branch).filter(k => !['id','name','kids'].includes(k));
-      if (unknown.length) e(`${path}: unknown field(s): ${unknown.join(', ')}`);
-      if (typeof branch.id !== 'string' || !ID.test(branch.id)) e(`${path}: spouse id is missing or invalid`);
-      else if (ids.has(branch.id)) e(`${path}: duplicate id "${branch.id}"`); else ids.add(branch.id);
-      if (typeof branch.name !== 'string' || !branch.name.trim() || branch.name.length > 80 || CTRL.test(branch.name)) e(`${path}: name must be 1-80 characters`);
-      if (!Array.isArray(branch.kids)) e(`${path}: kids must be a list`);
-      else branch.kids.forEach((k, j) => walk(k, `${path} › ${(k && Array.isArray(k.names) && k.names[0]) || j}`, 1));
-    });
-  }
 }
 
 // ---- human-readable comparison ------------------------------------------------
 const lab = n => (n.names || []).join(' & ');
-function flat(root) { const m = new Map(); (function f(n, pn) { (n.kids || []).forEach(k => { m.set(k.id, { n: k, p: pn }); f(k, k); }); })(root, root); (root.spouseBranches || []).forEach(branch => (branch.kids || []).forEach(k => {m.set(k.id,{n:k,p:root});(function f(n,p){(n.kids||[]).forEach(child=>{m.set(child.id,{n:child,p:n});f(child,child)})})(k,k)})); return m; }
+function flat(root) { const m = new Map(); (function f(n, pn) { (n.kids || []).forEach(k => { m.set(k.id, { n: k, p: pn }); f(k, k); }); })(root, root); return m; }
 export function describe(oldRoot, newRoot) {
   const A = flat(oldRoot || { kids: [] }), B = flat(newRoot), out = [];
-  const spouseNames = root => (root.spouseBranches || []).map(branch => branch.name || '').filter(Boolean);
-  if (JSON.stringify(spouseNames(oldRoot || {})) !== JSON.stringify(spouseNames(newRoot || {}))) out.push(`✏️ Additional spouse branches: ${(spouseNames(newRoot || {}).join(', ') || 'none')}`);
   B.forEach(({ n, p }, id) => {
     const x = A.get(id);
     if (!x) { out.push(`➕ **${lab(n)}** (under ${lab(p) || 'the branch head'})`); return; }
