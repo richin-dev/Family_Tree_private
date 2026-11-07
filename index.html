@@ -162,6 +162,7 @@
       background: linear-gradient(145deg,rgba(45,35,22,.96),rgba(17,17,15,.97));
       box-shadow: 0 12px 30px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.1)
     }
+    .family-summary[hidden] { display: none }
     .family-summary h2 { margin: 0; color: #f0d9a0; font: 600 14px var(--ff); letter-spacing: .025em }
     .family-summary-caption { margin: 3px 0 8px; color: #c7b993; font-size: 10.5px }
     .family-summary-stats { display: grid; gap: 0 }
@@ -1917,7 +1918,7 @@
     </div>
   </div>
   <div class="bar"><div class="menu-wrap"><button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel">☰</button><div class="menu-panel" id="menu-panel" hidden>
-    <button id="ed">✏️ Edit</button><button id="ea">Expand all</button><button id="ca">Collapse</button><button id="sz" title="Card size">Aa Size</button>
+    <button id="ed">✏️ Edit</button><button id="ea">Expand all</button><button id="ca">Collapse</button><button id="family-summary-toggle" type="button" aria-expanded="false" aria-controls="family-summary">Family at a glance</button><button id="sz" title="Card size">Aa Size</button>
     <button id="ab" class="edo" style="display:none">+ Add to branch</button><button id="loose-add" class="edo" style="display:none">＋ Floating slot</button><button id="undo" style="display:none" disabled>↶ Undo</button><button id="dis" style="display:none">↩ Discard my changes</button>
     <details><summary>Generation color reference</summary><div class="leg" id="leg"></div></details>
     <section class="theme-admin" id="theme-admin" hidden aria-label="Theme selector, family admin only">
@@ -1931,7 +1932,7 @@
   </div></div><div class="search-tools"><label class="sr-only" for="religious-filter">Religious Personnel</label><select class="rel-filter" id="religious-filter" aria-label="Religious Personnel"><option value="">Religious Personnel</option></select><label class="search-box" aria-label="Search family members"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 5 5h4l1.5 6.5M21 8.5 19 5h-4l-1.5 6.5M9.5 11.5h5"/><circle cx="6.5" cy="15" r="4"/><circle cx="17.5" cy="15" r="4"/></svg><input id="q" type="search" placeholder="Search a name…"></label><label class="sr-only" for="bg-filter">Filter by blood group</label><select class="bg-filter" id="bg-filter" aria-label="Filter by blood group"><option value="">🩸 Group</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select></div><div class="auth-corner"><button id="in" class="auth-in" style="display:none"><span class="admin-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2c-4.6 0-8 2.4-8 5.5V22h16v-2.5c0-3.1-3.4-5.5-8-5.5Z"/></svg></span><span>Sign in</span></button><button id="out" class="auth-out" style="display:none"><span class="admin-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2c-4.6 0-8 2.4-8 5.5V22h16v-2.5c0-3.1-3.4-5.5-8-5.5Z"/></svg></span><span>Sign out</span></button><button id="sub" style="display:none">💾 Save changes</button></div><span class="st" id="st"></span></div>
   <div id="bg-results" hidden role="region" aria-live="polite" aria-label="Blood group matches"></div>
   <div id="loose"></div>
-  <aside class="family-summary" aria-labelledby="family-summary-title">
+  <aside class="family-summary" id="family-summary" aria-labelledby="family-summary-title" hidden>
     <h2 id="family-summary-title">Family at a glance</h2>
     <p class="family-summary-caption">A quick count of everyone in the tree</p>
     <div class="family-summary-stats" role="group" aria-label="Family member counts" aria-live="polite">
@@ -1951,13 +1952,20 @@
     const RK = ['blue', 'green', 'orange', 'purple', 'teal'];
     const LINKS = {}; // optional fixed links: LINKS["NAME"]="https://…"
     const $ = id => document.getElementById(id);
-    const menuToggle = $('menu-toggle'), menuPanel = $('menu-panel');
+    const menuToggle = $('menu-toggle'), menuPanel = $('menu-panel'), familySummary = $('family-summary'), familySummaryToggle = $('family-summary-toggle');
     window.addEventListener('family-theme-change', event => {
       document.querySelectorAll('[data-theme-choice]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.themeChoice === event.detail.theme)));
     });
-    function closeMenu() {menuPanel.hidden = true; menuToggle.setAttribute('aria-expanded', 'false')}
+    function closeMenu() {menuPanel.hidden = true; menuToggle.setAttribute('aria-expanded', 'false'); menuToggle.setAttribute('aria-label', 'Open menu')}
     menuToggle.onclick = () => {menuPanel.hidden = !menuPanel.hidden; menuToggle.setAttribute('aria-expanded', String(!menuPanel.hidden)); menuToggle.setAttribute('aria-label', menuPanel.hidden ? 'Open menu' : 'Close menu')};
-    menuPanel.addEventListener('click', ev => {if (ev.target.closest('button')) closeMenu()});
+    familySummaryToggle.onclick = () => {
+      const expanded = familySummary.hidden;
+      familySummary.hidden = !expanded;
+      familySummaryToggle.setAttribute('aria-expanded', String(expanded));
+      familySummaryToggle.classList.toggle('on', expanded);
+      if (expanded && matchMedia('(max-width: 720px)').matches) familySummary.scrollIntoView({block:'nearest', behavior:'smooth'})
+    };
+    menuPanel.addEventListener('click', ev => {const button = ev.target.closest('button'); if (button) {closeMenu(); if (button.id === 'family-summary-toggle') menuToggle.focus()}});
     document.addEventListener('click', ev => {if (!ev.target.closest('.menu-wrap')) closeMenu()});
     document.addEventListener('keydown', ev => {if (ev.key === 'Escape') closeMenu()});
     const S = (k, v) => {try {if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v)} catch (e) {return null} };
