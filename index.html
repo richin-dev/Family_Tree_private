@@ -149,6 +149,29 @@
     #st:empty { display: none }
     #st:not(:empty) { grid-column: 1 / -1; padding: 3px 0 0; text-align: center }
 
+    .family-summary {
+      position: fixed;
+      top: 132px;
+      right: 14px;
+      z-index: 3;
+      width: min(220px, calc(100vw - 20px));
+      padding: 13px 14px 10px;
+      border: 1px solid rgba(200,164,92,.55);
+      border-radius: 12px;
+      color: #f1e3c4;
+      background: linear-gradient(145deg,rgba(45,35,22,.96),rgba(17,17,15,.97));
+      box-shadow: 0 12px 30px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.1)
+    }
+    .family-summary h2 { margin: 0; color: #f0d9a0; font: 600 14px var(--ff); letter-spacing: .025em }
+    .family-summary-caption { margin: 3px 0 8px; color: #c7b993; font-size: 10.5px }
+    .family-summary-stats { display: grid; gap: 0 }
+    .family-summary-stat { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; border-top: 1px solid rgba(200,164,92,.22) }
+    .family-summary-label { display: inline-flex; align-items: center; gap: 8px; color: #e5dcc9; font-size: 12px }
+    .family-summary-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: #d1a94e; box-shadow: 0 0 8px rgba(209,169,78,.4) }
+    .family-summary-stat.living .family-summary-dot { background: #84c8a0; box-shadow: 0 0 8px rgba(132,200,160,.38) }
+    .family-summary-stat.remembered .family-summary-dot { background: #a1a4aa; box-shadow: 0 0 8px rgba(180,180,180,.26) }
+    .family-summary-value { color: #fff1cf; font: 600 19px/1 Georgia,serif; font-variant-numeric: tabular-nums }
+
     .st {
       font-size: 11.5px;
       color: #f0d9a0;
@@ -1463,6 +1486,14 @@
         flex: none
       }
 
+      .family-summary {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: min(420px, calc(100% - 16px));
+        margin: 8px 8px 12px auto
+      }
+
       #banners {
         scroll-snap-type: x mandatory;
         gap: 8px;
@@ -1900,6 +1931,15 @@
   </div></div><div class="search-tools"><label class="sr-only" for="religious-filter">Religious Personnel</label><select class="rel-filter" id="religious-filter" aria-label="Religious Personnel"><option value="">Religious Personnel</option></select><label class="search-box" aria-label="Search family members"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 5 5h4l1.5 6.5M21 8.5 19 5h-4l-1.5 6.5M9.5 11.5h5"/><circle cx="6.5" cy="15" r="4"/><circle cx="17.5" cy="15" r="4"/></svg><input id="q" type="search" placeholder="Search a name…"></label><label class="sr-only" for="bg-filter">Filter by blood group</label><select class="bg-filter" id="bg-filter" aria-label="Filter by blood group"><option value="">🩸 Group</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select></div><div class="auth-corner"><button id="in" class="auth-in" style="display:none"><span class="admin-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2c-4.6 0-8 2.4-8 5.5V22h16v-2.5c0-3.1-3.4-5.5-8-5.5Z"/></svg></span><span>Sign in</span></button><button id="out" class="auth-out" style="display:none"><span class="admin-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4.2 4.2 0 1 0 0-8.4 4.2 4.2 0 0 0 0 8.4Zm0 2c-4.6 0-8 2.4-8 5.5V22h16v-2.5c0-3.1-3.4-5.5-8-5.5Z"/></svg></span><span>Sign out</span></button><button id="sub" style="display:none">💾 Save changes</button></div><span class="st" id="st"></span></div>
   <div id="bg-results" hidden role="region" aria-live="polite" aria-label="Blood group matches"></div>
   <div id="loose"></div>
+  <aside class="family-summary" aria-labelledby="family-summary-title">
+    <h2 id="family-summary-title">Family at a glance</h2>
+    <p class="family-summary-caption">A quick count of everyone in the tree</p>
+    <div class="family-summary-stats" role="group" aria-label="Family member counts" aria-live="polite">
+      <div class="family-summary-stat"><span class="family-summary-label"><span class="family-summary-dot" aria-hidden="true"></span>Total members</span><strong class="family-summary-value" id="family-count-total">—</strong></div>
+      <div class="family-summary-stat living"><span class="family-summary-label"><span class="family-summary-dot" aria-hidden="true"></span>Living</span><strong class="family-summary-value" id="family-count-living">—</strong></div>
+      <div class="family-summary-stat remembered"><span class="family-summary-label"><span class="family-summary-dot" aria-hidden="true"></span>Remembered</span><strong class="family-summary-value" id="family-count-remembered">—</strong></div>
+    </div>
+  </aside>
   <div class="wrap" id="wrap">
     <div id="banners"></div><i id="dv"></i><i id="dh"></i>
     <div id="tree"></div>
@@ -1976,6 +2016,17 @@
       }; f.click()
     }
     function reindex() {P = new Map(); DATA.forEach(r => (function f(n, p) {P.set(n.id, {n, p}); n.kids.forEach(k => f(k, n))})(r, null)); try {syncReligiousPersonnel()} catch (e) {console.error('Could not refresh the Religious Personnel list:', e && e.message || 'unknown error')}}
+    function updateFamilySummary() {
+      let total = 0, living = 0, remembered = 0;
+      const countPeople = n => {
+        (n.names || []).forEach((_, index) => {total++; if (dead(n, index)) remembered++; else living++});
+        (n.kids || []).forEach(countPeople)
+      };
+      DATA.forEach(countPeople);
+      $('family-count-total').textContent = DATA.length ? total.toLocaleString() : '—';
+      $('family-count-living').textContent = DATA.length ? living.toLocaleString() : '—';
+      $('family-count-remembered').textContent = DATA.length ? remembered.toLocaleString() : '—'
+    }
     const cnt = n => n.kids.reduce((a, k) => a + 1 + cnt(k), 0);
     function path(id) {const a = []; let e = P.get(id); while (e && e.p) {e = P.get(e.p.id); if (e && e.n.names.length && e.p) a.unshift(e.n.names[0])} return a}
     function syncReligiousPersonnel() {
@@ -2058,7 +2109,7 @@
     }
     let ET = null, STEP = 40;
     function render() {
-      $('pop').style.display = 'none'; const w = $('wrap'), sx = w.scrollLeft, sy = window.scrollY; banners(); renderLoose(); const t = $('tree'); t.innerHTML = ''; IDX = 0; if (!DATA.length) {t.innerHTML = '<div class="m" style="padding:30px 6px">Loading the family tree…</div>'; return } const r = DATA[cur];
+      updateFamilySummary(); $('pop').style.display = 'none'; const w = $('wrap'), sx = w.scrollLeft, sy = window.scrollY; banners(); renderLoose(); const t = $('tree'); t.innerHTML = ''; IDX = 0; if (!DATA.length) {t.innerHTML = '<div class="m" style="padding:30px 6px">Loading the family tree…</div>'; return } const r = DATA[cur];
       const h = document.createElement('div'); h.className = 'kids top'; h.style.margin = '0'; r.kids.forEach(x => h.appendChild(node(x, true))); t.appendChild(h);
       STEP = Math.max(14, Math.min(60, 2400 / Math.max(IDX, 1))); t.style.setProperty('--st', STEP + 'ms'); w.scrollLeft = sx; window.scrollTo(window.scrollX, sy); place()
     }

@@ -8,6 +8,7 @@ html[data-site-theme="classic-glass"] .bar,
 html[data-site-theme="classic-glass"] .side,
 html[data-site-theme="classic-glass"] .menu-panel,
 html[data-site-theme="classic-glass"] #bg-results,
+html[data-site-theme="classic-glass"] .family-summary,
 html[data-site-theme="classic-glass"] #loose {
   color:#f3f8ff; background:rgba(8,22,41,.66); border-color:rgba(151,207,249,.48);
   box-shadow:0 14px 38px rgba(0,5,17,.34),inset 0 1px rgba(240,250,255,.2);
@@ -21,6 +22,11 @@ html[data-site-theme="classic-glass"] .menu-panel button,
 html[data-site-theme="classic-glass"] .menu-panel summary,
 html[data-site-theme="classic-glass"] #bg-results .bg-result,
 html[data-site-theme="classic-glass"] #loose button { color:#edf7ff; border-color:rgba(144,201,246,.4); }
+html[data-site-theme="classic-glass"] .family-summary h2 { color:#eff8ff; }
+html[data-site-theme="classic-glass"] .family-summary-caption { color:#c8deef; }
+html[data-site-theme="classic-glass"] .family-summary-label { color:#e4f1fc; }
+html[data-site-theme="classic-glass"] .family-summary-stat { border-color:rgba(151,207,249,.2); }
+html[data-site-theme="classic-glass"] .family-summary-value { color:#fff; }
 html[data-site-theme="classic-glass"] .menu-panel button:hover,
 html[data-site-theme="classic-glass"] .menu-panel button:focus-visible { color:#fff; background:rgba(83,162,220,.24); box-shadow:inset 3px 0 #7bd2ff; }
 html[data-site-theme="classic-glass"] .menu-panel button.on,
