@@ -1,4 +1,4 @@
-// Public to read the tree, login to edit; family photos require a signed-in session.
+// Public to read the tree, login to edit; family photos and videos require a signed-in session.
 //  - Anyone with the link can load the page and public tree (without phone, address and blood group).
 //  - Signed-in family members get the full data and photos. Everything else needs a session.
 import { readSession, secretOk, json } from '../lib/auth.js';

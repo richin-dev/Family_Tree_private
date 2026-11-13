@@ -34,7 +34,22 @@
     .video-placeholder .play-mark{margin:auto;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(240,217,160,.64);border-radius:50%;font-size:17px;color:var(--blue);background:rgba(255,255,255,.06)}
     .video-placeholder strong{font:700 13px Cinzel,Georgia,serif;letter-spacing:.08em;text-transform:uppercase}
     .video-placeholder span{font-size:12px;color:var(--muted)}
+    .video-title{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;padding:10px 14px;border:1px solid rgba(255,255,255,.3);border-radius:12px;color:#fff;background:rgba(7,13,20,.72);box-shadow:0 8px 25px rgba(0,0,0,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font:600 13px/1.35 system-ui,sans-serif;opacity:0;transform:translateY(8px);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
+    .video-title.visible{opacity:1;transform:none}
+    .video-title[hidden]{display:none}
+    .video-frame video{position:relative;z-index:1}
     .video-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px}
+    .video-status{min-height:1.5em;margin:8px 0 0;color:var(--muted);font-size:12px;text-align:center}
+    .video-login{color:var(--gold);text-underline-offset:3px}
+    .video-admin{display:grid;gap:8px;margin:14px auto 0;padding:12px;border:1px solid rgba(231,196,124,.3);border-radius:12px;background:rgba(255,255,255,.04);text-align:left}
+    .video-admin[hidden]{display:none}
+    .video-admin label{font-size:12px;color:var(--muted)}
+    .video-admin input{max-width:100%;color:#f6f0e3}
+    .video-admin button{justify-self:center;padding:8px 14px;border:1px solid rgba(231,196,124,.5);border-radius:999px;color:#f0d9a0;background:rgba(255,255,255,.06);font:600 12px system-ui;cursor:pointer}
+    .video-admin progress{width:100%;height:8px;accent-color:var(--gold)}
+    html[data-site-theme="classic-glass"] .video-title{color:#f4f8ff;background:rgba(8,22,41,.72);border-color:rgba(151,207,249,.5);box-shadow:0 10px 28px rgba(0,5,17,.4),inset 0 1px rgba(240,250,255,.16)}
+    html[data-site-theme="classic-glass"] .video-admin{background:rgba(8,22,41,.54);border-color:rgba(151,207,249,.35);backdrop-filter:blur(16px)}
+    @media(max-width:520px){.video-carousel{width:100%}.video-frame{border-radius:13px}.video-title{left:8px;right:8px;bottom:8px;padding:8px 10px;font-size:12px}.video-controls{gap:12px}.video-controls button{width:38px;height:36px}}
     .video-controls button{width:34px;height:30px;border:1px solid rgba(231,196,124,.46);border-radius:999px;color:#f0d9a0;background:rgba(255,255,255,.055);font:16px/1 system-ui;cursor:pointer}
     .video-controls button:hover,.video-controls button:focus-visible{background:rgba(231,196,124,.18);outline:2px solid var(--blue);outline-offset:2px}
     .video-dots{display:flex;align-items:center;gap:8px}
@@ -59,49 +74,135 @@
     <p class="intro">Explore the people and connections that bring our family together.</p>
     <section class="video-carousel" aria-label="Family videos">
       <div class="video-frame" aria-live="polite">
-        <div class="video-slide" data-video-slide="0">
-          <video playsinline preload="none" aria-label="Family video 1"><!-- Add a source later: <source src="assets/welcome-video-1.mp4" type="video/mp4"> --></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Video 1 will appear here</span></div>
+        <div class="video-slide" data-video-slide="0" data-video-id="thankamma" data-video-name="Thankamma_Kochappan.mp4">
+          <video playsinline preload="none" aria-label="Thankamma_Kochappan.mp4"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Thankamma_Kochappan.mp4</span></div>
+          <div class="video-title" aria-live="polite" hidden>Thankamma_Kochappan.mp4</div>
         </div>
-        <div class="video-slide" data-video-slide="1" hidden>
-          <video playsinline preload="none" aria-label="Family video 2"><!-- Add a source later: <source src="assets/welcome-video-2.mp4" type="video/mp4"> --></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>More family memories</strong><span>Video 2 will appear here</span></div>
+        <div class="video-slide" data-video-slide="1" data-video-id="anthony" data-video-name="Anthony kadavy.mp4" hidden>
+          <video playsinline preload="none" aria-label="Anthony kadavy.mp4"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Anthony kadavy.mp4</span></div>
+          <div class="video-title" aria-live="polite" hidden>Anthony kadavy.mp4</div>
+        </div>
+        <div class="video-slide" data-video-slide="2" data-video-id="jose" data-video-name="Jose Kadavy.MOV" hidden>
+          <video playsinline preload="none" aria-label="Jose Kadavy.MOV"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Jose Kadavy.MOV</span></div>
+          <div class="video-title" aria-live="polite" hidden>Jose Kadavy.MOV</div>
         </div>
       </div>
       <div class="video-controls" aria-label="Video carousel controls">
         <button type="button" data-video-prev aria-label="Previous video">‹</button>
         <div class="video-dots" role="group" aria-label="Choose a video">
-          <button type="button" data-video-dot="0" aria-label="Show video 1" aria-current="true"></button>
-          <button type="button" data-video-dot="1" aria-label="Show video 2" aria-current="false"></button>
+          <button type="button" data-video-dot="0" aria-label="Show Thankamma_Kochappan.mp4" aria-current="true"></button>
+          <button type="button" data-video-dot="1" aria-label="Show Anthony kadavy.mp4" aria-current="false"></button>
+          <button type="button" data-video-dot="2" aria-label="Show Jose Kadavy.MOV" aria-current="false"></button>
         </div>
         <button type="button" data-video-next aria-label="Next video">›</button>
+      </div>
+      <p class="video-status" data-video-status role="status" aria-live="polite">Sign in to view the private family videos.</p>
+      <a class="video-login" data-video-login href="login.html?next=%2F">Sign in to watch</a>
+      <div class="video-admin" data-video-admin hidden>
+        <label for="family-video-files">Family admin: choose the three optimized MP4 files. Original filenames appear in the player.</label>
+        <input id="family-video-files" type="file" accept="video/mp4,.mp4" multiple>
+        <progress data-video-progress max="100" value="0" hidden></progress>
+        <button type="button" data-video-upload>Upload videos to private Google Drive</button>
+        <span data-video-admin-status role="status" aria-live="polite"></span>
       </div>
     </section>
     <a class="explore" href="tree.html"><span>Explore</span><span class="arrow" aria-hidden="true">→</span></a>
   </main>
   <footer><a href="privacy.html">Privacy</a></footer>
-  <script>
+    <script>
     (() => {
       const slides = [...document.querySelectorAll('[data-video-slide]')];
       const dots = [...document.querySelectorAll('[data-video-dot]')];
-      let current = 0;
-      function show(index) {
-        current = (index + slides.length) % slides.length;
+      const status = document.querySelector('[data-video-status]');
+      const login = document.querySelector('[data-video-login]');
+      const admin = document.querySelector('[data-video-admin]');
+      const filesInput = document.querySelector('#family-video-files');
+      const uploadButton = document.querySelector('[data-video-upload]');
+      const uploadStatus = document.querySelector('[data-video-admin-status]');
+      const progress = document.querySelector('[data-video-progress]');
+      const specs = [
+        {id:'thankamma', title:'Thankamma_Kochappan.mp4', uploadName:'Thankamma_Kochappan.mp4'},
+        {id:'anthony', title:'Anthony kadavy.mp4', uploadName:'Anthony kadavy.mp4'},
+        {id:'jose', title:'Jose Kadavy.MOV', uploadName:'Jose Kadavy.mp4'}
+      ];
+      let current = 0, available = new Set(), signedIn = false;
+      const setMessage = text => { status.textContent = text; };
+      function updateSlide() {
         slides.forEach((slide, i) => {
-          slide.hidden = i !== current;
-          const video = slide.querySelector('video');
-          if (i !== current) video.pause();
-          const placeholder = slide.querySelector('.video-placeholder');
-          const hasVideo = Boolean(video.querySelector('source[src]') || video.getAttribute('src'));
-          video.controls = hasVideo;
-          placeholder.hidden = hasVideo;
+          const active = i === current, video = slide.querySelector('video');
+          slide.hidden = !active;
+          if (!active) { video.pause(); slide.querySelector('.video-title').hidden = true; }
+          dots[i].setAttribute('aria-current', String(active));
+          if (active && available.has(slide.dataset.videoId)) {
+            if (!video.src) { video.src = '/api/videos/' + encodeURIComponent(slide.dataset.videoId); video.controls = true; video.load(); }
+            slide.querySelector('.video-placeholder').hidden = true;
+          } else if (active) {
+            video.controls = false;
+            slide.querySelector('.video-placeholder').hidden = false;
+            slide.querySelector('.video-placeholder span:last-child').textContent = signedIn ? 'This video has not been uploaded yet.' : 'Sign in to view this private video.';
+          }
         });
-        dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === current)));
       }
+      function show(index) { current = (index + slides.length) % slides.length; updateSlide(); }
+      slides.forEach(slide => {
+        const video = slide.querySelector('video'), title = slide.querySelector('.video-title');
+        video.addEventListener('play', () => { title.hidden = false; requestAnimationFrame(() => title.classList.add('visible')); });
+        video.addEventListener('ended', () => { title.classList.remove('visible'); setTimeout(() => { title.hidden = true; }, 260); });
+        video.addEventListener('error', () => { if (signedIn) setMessage('The video could not be loaded. Check that Google Drive is connected and the family video migration is applied.'); });
+      });
       document.querySelector('[data-video-prev]').addEventListener('click', () => show(current - 1));
       document.querySelector('[data-video-next]').addEventListener('click', () => show(current + 1));
       dots.forEach(dot => dot.addEventListener('click', () => show(Number(dot.dataset.videoDot))));
-      show(0);
+      async function refresh() {
+        try {
+          const response = await fetch('/api/videos', {credentials:'same-origin', cache:'no-store'});
+          if (response.status === 401) { signedIn = false; login.hidden = false; setMessage('Family videos are private to signed-in family members.'); return; }
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Video storage is not ready.');
+          signedIn = true; login.hidden = true; available = new Set(data.available || []);
+          admin.hidden = !data.canUpload;
+          if (available.size) setMessage('Private family videos · Family sign-in active');
+          else setMessage('The family admin can upload the videos to Google Drive here.');
+          updateSlide();
+        } catch (error) { setMessage(error.message || 'Family videos are temporarily unavailable.'); }
+      }
+      async function uploadFile(file, spec, index) {
+        const start = await fetch('/api/videos/upload/start', {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:spec.id, size:file.size})});
+        const setup = await start.json().catch(() => ({}));
+        if (!start.ok) throw new Error(setup.error || 'Could not start the Google Drive upload.');
+        const chunkSize = setup.chunkSize;
+        for (let offset = 0; offset < file.size;) {
+          const end = Math.min(offset + chunkSize, file.size), chunk = file.slice(offset, end);
+          const response = await fetch('/api/videos/upload/chunk', {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/octet-stream','X-Upload-Id':setup.uploadId,'Content-Range':'bytes '+offset+'-'+(end - 1)+'/'+file.size}, body:chunk});
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(result.error || 'The Google Drive upload stopped. You can retry the selected files.');
+          offset = result.nextOffset ?? end;
+          progress.value = Math.round(((index + offset / file.size) / specs.length) * 100);
+          uploadStatus.textContent = 'Uploading '+spec.title+' · '+progress.value+'%';
+          if (result.done) break;
+        }
+      }
+      uploadButton.addEventListener('click', async () => {
+        const files = [...filesInput.files];
+        const byName = new Map(files.map(file => [file.name, file]));
+        if (files.length !== 3 || specs.some(spec => !byName.has(spec.uploadName))) {
+          uploadStatus.textContent = 'Choose these files: Thankamma_Kochappan.mp4, Anthony kadavy.mp4, and the compatible Jose Kadavy.mp4 conversion.';
+          return;
+        }
+        uploadButton.disabled = true; filesInput.disabled = true; progress.hidden = false; progress.value = 0;
+        try {
+          for (let i = 0; i < specs.length; i++) await uploadFile(byName.get(specs[i].uploadName), specs[i], i);
+          uploadStatus.textContent = 'All three videos are saved privately in Google Drive.';
+          await refresh();
+          slides.forEach(slide => { const video = slide.querySelector('video'); video.removeAttribute('src'); video.load(); slide.querySelector('.video-title').hidden = true; });
+          show(current);
+        } catch (error) { uploadStatus.textContent = error.message || 'Upload failed.'; }
+        finally { uploadButton.disabled = false; filesInput.disabled = false; }
+      });
+      show(0); refresh();
     })();
   </script>
 </body>

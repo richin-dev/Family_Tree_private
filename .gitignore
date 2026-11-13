@@ -5,3 +5,6 @@ summary.md
 .auth
 .dev.vars
 *.mov
+
+# Locally prepared family video assets; upload them to private Google Drive through the admin carousel.
+video-assets/

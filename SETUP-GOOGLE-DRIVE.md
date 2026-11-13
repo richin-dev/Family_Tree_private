@@ -1,6 +1,6 @@
-# Private Google Drive photo storage
+# Private Google Drive photo and video storage
 
-This project stores uploaded photos in a private Google Drive folder. Only a signed-in family user can view photos; only the family admin can upload, replace, or remove them. Google Drive files are never made public. Cloudflare Pages streams a photo to an authenticated user after checking the family tree and session.
+This project stores uploaded photos and family videos in private Google Drive folders. Only signed-in family members can view them; only the family admin can upload or replace them. Google Drive files are never made public. Cloudflare Pages streams each video to an authenticated user, including browser byte-range requests for seeking.
 
 The editor accepts JPEG/JPG or PNG originals up to 2 MiB (2,097,152 bytes) and 40 megapixels. The admin can draw a freeform crop; the editor keeps that crop's aspect ratio, scales its longest side to at most 300 px, converts it to JPEG, and rejects results over 600,000 bytes. The upload endpoint independently validates that the received data is a JPEG no larger than 300 × 300 pixels and 600,000 bytes. D1 stores the Drive file ID and the person's existing photo ID. The Google refresh token is encrypted in D1 using `SESSION_SECRET`.
 
@@ -53,3 +53,31 @@ Google recommends offline OAuth access for server apps that must reach Drive whe
 - Changing `SESSION_SECRET` makes the stored refresh token unreadable; reconnect Drive after rotating that secret.
 - Drive storage uses the chosen Google account's available storage and API quota.
 - Never share OAuth client secrets, session secrets, or the D1 database contents in chat or screenshots.
+
+## Family video carousel
+
+The cover page has a three-video carousel. Titles use the uploaded filenames and appear in a bottom glass overlay while a video plays; the overlay fades away when it ends. Play/pause uses the browser's video controls, with previous/next buttons and dots for changing videos. The carousel works in the existing Classic and Classic Glass themes. Videos remain private to signed-in family members.
+
+### Prepare the three files
+
+The original uploads are in D:\vids\edited and remain unchanged. The two MP4 inputs already use H.264 video. The MOV uses H.264 video with uncompressed PCM audio, so it needs an MP4/AAC conversion for reliable browser playback. Prepare all three optimized H.264/AAC MP4s with FFmpeg:
+
+~~~powershell
+node scripts/prepare-videos.mjs
+~~~
+
+The command writes the results to the ignored local video-assets folder. It does not add large media files to Git. It requires FFmpeg installed and available on PATH.
+
+### Upload to private Google Drive
+
+1. Apply the migration that adds the private video records and resumable-upload sessions:
+
+   ~~~powershell
+   npx wrangler d1 migrations apply family-tree-db --remote
+   ~~~
+
+2. Deploy the site changes and make sure the existing D1, Google OAuth, and drive.file setup is active. Do not make the Drive folder or files public.
+3. Sign in to the website as the family admin. On the cover page, select the three generated MP4s from video-assets in the video upload panel. Uploads are sent in 8 MB chunks to a private **Family Tree Videos** folder. Google Drive stores the files; D1 stores only their private Drive IDs and upload progress.
+4. Signed-in family members can then watch and seek through the carousel. Visitors without a family sign-in see a sign-in prompt.
+
+The MOV is presented with its original title Jose Kadavy.MOV; the stored playback copy is Jose Kadavy.mp4 with H.264/AAC. Re-uploading replaces the corresponding private Drive file after the new upload completes.
