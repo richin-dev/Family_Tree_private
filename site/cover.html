@@ -86,20 +86,20 @@
     <p class="intro">Explore the people and connections that bring our family together.</p>
     <section class="video-carousel" aria-label="Family videos">
       <div class="video-frame" aria-live="polite">
-        <div class="video-slide" data-video-slide="0" data-video-id="thankamma" data-video-name="Thankamma_Kochappan.mp4">
-          <video playsinline preload="none" aria-label="Thankamma_Kochappan.mp4"></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Thankamma_Kochappan.mp4</span></div>
-          <div class="video-title" aria-live="polite" hidden>Thankamma_Kochappan.mp4</div>
+        <div class="video-slide" data-video-slide="0" data-video-id="thankamma" data-video-name="Thankamma Kochappan">
+          <video playsinline preload="none" aria-label="Thankamma Kochappan"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Thankamma Kochappan</span></div>
+          <div class="video-title" aria-live="polite" hidden>Thankamma Kochappan</div>
         </div>
-        <div class="video-slide" data-video-slide="1" data-video-id="anthony" data-video-name="Anthony kadavy.mp4" hidden>
-          <video playsinline preload="none" aria-label="Anthony kadavy.mp4"></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Anthony kadavy.mp4</span></div>
-          <div class="video-title" aria-live="polite" hidden>Anthony kadavy.mp4</div>
+        <div class="video-slide" data-video-slide="1" data-video-id="anthony" data-video-name="Anthony Kadavy" hidden>
+          <video playsinline preload="none" aria-label="Anthony Kadavy"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Anthony Kadavy</span></div>
+          <div class="video-title" aria-live="polite" hidden>Anthony Kadavy</div>
         </div>
-        <div class="video-slide" data-video-slide="2" data-video-id="jose" data-video-name="Jose Kadavy.MOV" hidden>
-          <video playsinline preload="none" aria-label="Jose Kadavy.MOV"></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Jose Kadavy.MOV</span></div>
-          <div class="video-title" aria-live="polite" hidden>Jose Kadavy.MOV</div>
+        <div class="video-slide" data-video-slide="2" data-video-id="jose" data-video-name="Jose Kadavy" hidden>
+          <video playsinline preload="none" aria-label="Jose Kadavy"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Jose Kadavy</span></div>
+          <div class="video-title" aria-live="polite" hidden>Jose Kadavy</div>
         </div>
       </div>
       <div class="video-controls" aria-label="Video carousel controls">
@@ -141,12 +141,22 @@
       const uploadStatus = document.querySelector('[data-video-admin-status]');
       const progress = document.querySelector('[data-video-progress]');
       const specs = [
-        {id:'thankamma', title:'Thankamma_Kochappan.mp4'},
-        {id:'anthony', title:'Anthony kadavy.mp4'},
-        {id:'jose', title:'Jose Kadavy.MOV'}
+        {id:'thankamma', title:'Thankamma Kochappan'},
+        {id:'anthony', title:'Anthony kadavy'},
+        {id:'jose', title:'Jose Kadavy'}
       ];
       let current = 0, available = new Set(), signedIn = false;
       const setMessage = text => { status.textContent = text; };
+      function setVideoName(slide, name) {
+        const clean = String(name || '').replace(/\.[^.]+$/,'').trim();
+        if (!clean) return;
+        slide.dataset.videoName = clean;
+        slide.querySelector('video').setAttribute('aria-label', clean);
+        slide.querySelector('.video-title').textContent = clean;
+        const placeholder = slide.querySelector('.video-placeholder span:last-child');
+        if (placeholder.textContent !== 'This video has not been uploaded yet.' && placeholder.textContent !== 'Sign in to view this private video.') placeholder.textContent = clean;
+        dots[Number(slide.dataset.videoSlide)].setAttribute('aria-label','Show ' + clean);
+      }
       function updateSlide() {
         slides.forEach((slide, i) => {
           const active = i === current, video = slide.querySelector('video');
@@ -187,6 +197,10 @@
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || 'Video storage is not ready.');
           signedIn = true; login.hidden = true; available = new Set(data.available || []);
+          slides.forEach(slide => {
+            const spec = specs.find(item => item.id === slide.dataset.videoId);
+            setVideoName(slide, data.names?.[slide.dataset.videoId] || spec?.title || slide.dataset.videoName);
+          });
           admin.hidden = !data.canUpload;
           if (available.size) setMessage('Private family videos · Family sign-in active');
           else setMessage('Family videos are not available yet.');
@@ -194,7 +208,7 @@
         } catch (error) { setMessage(error.message || 'Family videos are temporarily unavailable.'); }
       }
       async function uploadFile(file, spec) {
-        const start = await fetch('/api/videos/upload/start', {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:spec.id, size:file.size})});
+        const start = await fetch('/api/videos/upload/start', {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:spec.id, size:file.size, displayName:file.name})});
         const setup = await start.json().catch(() => ({}));
         if (!start.ok) throw new Error(setup.error || 'Could not start the Google Drive upload.');
         const chunkSize = setup.chunkSize;
@@ -220,7 +234,8 @@
         uploadButton.disabled = true; removeButton.disabled = true; fileInput.disabled = true; progress.hidden = false; progress.value = 0;
         try {
           await uploadFile(file, spec);
-          uploadStatus.textContent = spec.title + ' is saved privately in Google Drive.';
+          setVideoName(slides[current], file.name);
+          uploadStatus.textContent = slides[current].dataset.videoName + ' is saved privately in Google Drive.';
           await refresh();
           slides.forEach(slide => { const video = slide.querySelector('video'); video.removeAttribute('src'); video.load(); slide.querySelector('.video-title').hidden = true; });
           show(current);

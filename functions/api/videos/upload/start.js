@@ -18,6 +18,8 @@ export async function onRequestPost(ctx) {
   let body; try { body = await ctx.request.json(); } catch { return json({error:'Invalid upload details.'},400); }
   const spec = SPECS[body.id], size = Number(body.size);
   if (!spec || !Number.isSafeInteger(size) || size < 1 || size > MAX_BYTES) return json({error:'Choose one of the three family videos, up to 1.5 GB.'},400);
+  const displayName = String(body.displayName || '').replace(/[\\/]/g,' ').replace(/\.[^.]+$/,'').trim().slice(0,120);
+  if (!displayName) return json({error:'The selected video needs a name.'},400);
   try {
     const folderId = await driveVideoFolderId(ctx);
     const response = await driveRequest(ctx,UPLOAD_API+'/files?uploadType=resumable&fields=id,name',{
@@ -30,7 +32,7 @@ export async function onRequestPost(ctx) {
     await ctx.env.FAMILY_DB.prepare('DELETE FROM family_video_uploads WHERE video_id=?').bind(body.id).run();
     const uploadId = crypto.randomUUID();
     await ctx.env.FAMILY_DB.prepare('INSERT INTO family_video_uploads(upload_id,video_id,display_name,total_bytes,next_offset,session_url) VALUES(?,?,?,?,0,?)')
-      .bind(uploadId,body.id,spec.displayName,size,sessionUrl).run();
+      .bind(uploadId,body.id,displayName,size,sessionUrl).run();
     return json({uploadId,chunkSize:CHUNK_SIZE});
   } catch (error) { return json({error:error.message || 'Google Drive is unavailable.'},503); }
 }
