@@ -86,28 +86,28 @@
     <p class="intro">Explore the people and connections that bring our family together.</p>
     <section class="video-carousel" aria-label="Family videos">
       <div class="video-frame" aria-live="polite">
-        <div class="video-slide" data-video-slide="0" data-video-id="thankamma" data-video-name="Thankamma Kochappan">
-          <video playsinline preload="none" aria-label="Thankamma Kochappan"></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Thankamma Kochappan</span></div>
-          <div class="video-title" aria-live="polite" hidden>Thankamma Kochappan</div>
+        <div class="video-slide" data-video-slide="0" data-video-id="thankamma" data-video-name="">
+          <video playsinline preload="none" aria-label="Family video"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span></span></div>
+          <div class="video-title" aria-live="polite" hidden></div>
         </div>
-        <div class="video-slide" data-video-slide="1" data-video-id="anthony" data-video-name="Anthony Kadavy" hidden>
-          <video playsinline preload="none" aria-label="Anthony Kadavy"></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Anthony Kadavy</span></div>
-          <div class="video-title" aria-live="polite" hidden>Anthony Kadavy</div>
+        <div class="video-slide" data-video-slide="1" data-video-id="anthony" data-video-name="" hidden>
+          <video playsinline preload="none" aria-label="Family video"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span></span></div>
+          <div class="video-title" aria-live="polite" hidden></div>
         </div>
-        <div class="video-slide" data-video-slide="2" data-video-id="jose" data-video-name="Jose Kadavy" hidden>
-          <video playsinline preload="none" aria-label="Jose Kadavy"></video>
-          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span>Jose Kadavy</span></div>
-          <div class="video-title" aria-live="polite" hidden>Jose Kadavy</div>
+        <div class="video-slide" data-video-slide="2" data-video-id="jose" data-video-name="" hidden>
+          <video playsinline preload="none" aria-label="Family video"></video>
+          <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span></span></div>
+          <div class="video-title" aria-live="polite" hidden></div>
         </div>
       </div>
       <div class="video-controls" aria-label="Video carousel controls">
         <button type="button" data-video-prev aria-label="Previous video">‹</button>
         <div class="video-dots" role="group" aria-label="Choose a video">
-          <button type="button" data-video-dot="0" aria-label="Show Thankamma_Kochappan.mp4" aria-current="true"></button>
-          <button type="button" data-video-dot="1" aria-label="Show Anthony kadavy.mp4" aria-current="false"></button>
-          <button type="button" data-video-dot="2" aria-label="Show Jose Kadavy.MOV" aria-current="false"></button>
+          <button type="button" data-video-dot="0" aria-label="Show video 1" aria-current="true"></button>
+          <button type="button" data-video-dot="1" aria-label="Show video 2" aria-current="false"></button>
+          <button type="button" data-video-dot="2" aria-label="Show video 3" aria-current="false"></button>
         </div>
         <button type="button" data-video-next aria-label="Next video">›</button>
       </div>
@@ -140,11 +140,7 @@
       const removeButton = document.querySelector('[data-video-remove]');
       const uploadStatus = document.querySelector('[data-video-admin-status]');
       const progress = document.querySelector('[data-video-progress]');
-      const specs = [
-        {id:'thankamma', title:'Thankamma Kochappan'},
-        {id:'anthony', title:'Anthony kadavy'},
-        {id:'jose', title:'Jose Kadavy'}
-      ];
+      const specs = ['thankamma','anthony','jose'].map(id => ({id}));
       let current = 0, available = new Set(), signedIn = false;
       const setMessage = text => { status.textContent = text; };
       function setVideoName(slide, name) {
@@ -198,8 +194,7 @@
           if (!response.ok) throw new Error(data.error || 'Video storage is not ready.');
           signedIn = true; login.hidden = true; available = new Set(data.available || []);
           slides.forEach(slide => {
-            const spec = specs.find(item => item.id === slide.dataset.videoId);
-            setVideoName(slide, data.names?.[slide.dataset.videoId] || spec?.title || slide.dataset.videoName);
+            setVideoName(slide, data.names?.[slide.dataset.videoId]);
           });
           admin.hidden = !data.canUpload;
           if (available.size) setMessage('Private family videos · Family sign-in active');
@@ -219,7 +214,7 @@
           if (!response.ok) throw new Error(result.error || 'The Google Drive upload stopped. You can retry the selected files.');
           offset = result.nextOffset ?? end;
           progress.value = Math.round((offset / file.size) * 100);
-          uploadStatus.textContent = 'Uploading '+spec.title+' · '+progress.value+'%';
+          uploadStatus.textContent = 'Uploading video · '+progress.value+'%';
           if (result.done) break;
         }
       }
@@ -244,8 +239,8 @@
       });
       removeButton.addEventListener('click', async () => {
         const slide = slides[current], id = slide.dataset.videoId, spec = specs.find(item => item.id === id);
-        if (!available.has(id) || !spec || !window.confirm('Remove ' + spec.title + ' from the family video slot?')) return;
-        uploadButton.disabled = true; removeButton.disabled = true; uploadStatus.textContent = 'Removing ' + spec.title + '…';
+        if (!available.has(id) || !spec || !window.confirm('Remove this video from the slot?')) return;
+        uploadButton.disabled = true; removeButton.disabled = true; uploadStatus.textContent = 'Removing video…';
         try {
           const response = await fetch('/api/videos/' + encodeURIComponent(id), {method:'DELETE', credentials:'same-origin'});
           const result = await response.json().catch(() => ({}));
@@ -254,7 +249,7 @@
           const video = slide.querySelector('video'); video.pause(); video.removeAttribute('src'); video.load();
           slide.querySelector('.video-title').hidden = true;
           await refresh();
-          uploadStatus.textContent = spec.title + ' was removed.';
+          uploadStatus.textContent = 'Video removed.';
           setTimeout(() => { uploadStatus.textContent = ''; }, 3500);
         } catch (error) { uploadStatus.textContent = error.message || 'Could not remove this video.'; }
         finally { uploadButton.disabled = false; removeButton.disabled = false; }
