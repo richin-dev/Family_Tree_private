@@ -86,17 +86,17 @@
     <section class="video-carousel" aria-label="Family videos">
       <div class="video-frame" aria-live="polite">
         <div class="video-slide" data-video-slide="0" data-video-id="thankamma" data-video-name="">
-          <video playsinline preload="none" aria-label="Family video"></video>
+          <video playsinline muted autoplay preload="none" aria-label="Family video"></video>
           <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span></span></div>
           <div class="video-title" aria-live="polite" hidden></div>
         </div>
         <div class="video-slide" data-video-slide="1" data-video-id="anthony" data-video-name="" hidden>
-          <video playsinline preload="none" aria-label="Family video"></video>
+          <video playsinline muted autoplay preload="none" aria-label="Family video"></video>
           <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span></span></div>
           <div class="video-title" aria-live="polite" hidden></div>
         </div>
         <div class="video-slide" data-video-slide="2" data-video-id="jose" data-video-name="" hidden>
-          <video playsinline preload="none" aria-label="Family video"></video>
+          <video playsinline muted autoplay preload="none" aria-label="Family video"></video>
           <div class="video-placeholder"><span class="play-mark" aria-hidden="true">▶</span><strong>Family memories</strong><span></span></div>
           <div class="video-title" aria-live="polite" hidden></div>
         </div>
@@ -166,7 +166,11 @@
             removeButton.title = 'Remove ' + slide.dataset.videoName;
           }
           if (active && available.has(slide.dataset.videoId)) {
-            if (!video.src) { video.src = '/api/videos/' + encodeURIComponent(slide.dataset.videoId); video.controls = true; video.load(); }
+            video.muted = true;
+            video.autoplay = true;
+            video.controls = true;
+            if (!video.src) { video.src = '/api/videos/' + encodeURIComponent(slide.dataset.videoId); video.load(); }
+            video.play().catch(() => {});
             slide.querySelector('.video-placeholder').hidden = true;
           } else if (active) {
             video.controls = false;
@@ -196,7 +200,7 @@
             setVideoName(slide, data.names?.[slide.dataset.videoId]);
           });
           admin.hidden = !data.canUpload;
-          if (available.size) setMessage('Private family videos · Family sign-in active');
+          if (available.size) setMessage('Family videos');
           else setMessage('Family videos are not available yet.');
           updateSlide();
         } catch (error) { setMessage(error.message || 'Family videos are temporarily unavailable.'); }
