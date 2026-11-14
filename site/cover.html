@@ -141,9 +141,9 @@
       const uploadStatus = document.querySelector('[data-video-admin-status]');
       const progress = document.querySelector('[data-video-progress]');
       const specs = [
-        {id:'thankamma', title:'Thankamma_Kochappan.mp4', uploadName:'Thankamma_Kochappan.mp4'},
-        {id:'anthony', title:'Anthony kadavy.mp4', uploadName:'Anthony kadavy.mp4'},
-        {id:'jose', title:'Jose Kadavy.MOV', uploadName:'Jose Kadavy.mp4'}
+        {id:'thankamma', title:'Thankamma_Kochappan.mp4'},
+        {id:'anthony', title:'Anthony kadavy.mp4'},
+        {id:'jose', title:'Jose Kadavy.MOV'}
       ];
       let current = 0, available = new Set(), signedIn = false;
       const setMessage = text => { status.textContent = text; };
@@ -213,8 +213,8 @@
       fileInput.addEventListener('change', async () => {
         const spec = specs.find(item => item.id === slides[current].dataset.videoId);
         const file = fileInput.files[0];
-        if (!spec || !file || file.name !== spec.uploadName) {
-          uploadStatus.textContent = spec?.id === 'jose' ? 'Choose the compatible Jose Kadavy.mp4 conversion.' : 'Choose ' + (spec?.uploadName || 'the matching MP4 file') + '.';
+        if (!spec || !file) {
+          uploadStatus.textContent = 'Choose a video file for this slot.';
           return;
         }
         uploadButton.disabled = true; removeButton.disabled = true; fileInput.disabled = true; progress.hidden = false; progress.value = 0;
