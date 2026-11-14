@@ -41,14 +41,26 @@
     .video-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:10px}
     .video-status{min-height:1.5em;margin:8px 0 0;color:var(--muted);font-size:12px;text-align:center}
     .video-login{color:var(--gold);text-underline-offset:3px}
-    .video-admin{display:grid;gap:8px;margin:14px auto 0;padding:12px;border:1px solid rgba(231,196,124,.3);border-radius:12px;background:rgba(255,255,255,.04);text-align:left}
-    .video-admin[hidden]{display:none}
-    .video-admin label{font-size:12px;color:var(--muted)}
-    .video-admin input{max-width:100%;color:#f6f0e3}
-    .video-admin button{justify-self:center;padding:8px 14px;border:1px solid rgba(231,196,124,.5);border-radius:999px;color:#f0d9a0;background:rgba(255,255,255,.06);font:600 12px system-ui;cursor:pointer}
-    .video-admin progress{width:100%;height:8px;accent-color:var(--gold)}
+    .video-admin-tools{position:absolute;inset:0;z-index:4;pointer-events:none}
+    .video-admin-tools[hidden]{display:none}
+    .video-admin-tools button{position:absolute;display:grid;place-items:center;width:42px;height:42px;padding:0;border:1px solid rgba(240,217,160,.68);border-radius:50%;color:#fff4d5;background:rgba(7,13,20,.66);box-shadow:0 4px 18px rgba(0,0,0,.3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:pointer;pointer-events:auto;transition:background .18s,transform .18s}
+    .video-admin-tools button:hover{transform:scale(1.06);background:rgba(7,13,20,.88)}
+    .video-admin-tools button:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+    .video-admin-tools [data-video-upload]{top:50%;left:50%;transform:translate(-50%,-50%)}
+    .video-admin-tools [data-video-upload]:hover{transform:translate(-50%,-50%) scale(1.06)}
+    .video-admin-tools [data-video-remove]{top:10px;right:10px;width:34px;height:34px;color:#ffe1dc;border-color:rgba(255,190,178,.62)}
+    .video-admin-tools [data-video-remove][hidden]{display:none}
+    .video-admin-tools svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .video-admin-tools [data-video-remove] svg{width:17px;height:17px}
+    .video-admin-status{position:absolute;left:12px;right:12px;bottom:12px;z-index:5;padding:7px 10px;border:1px solid rgba(255,255,255,.22);border-radius:10px;color:#fff;background:rgba(7,13,20,.78);font-size:12px;text-align:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none}
+    .video-admin-status:empty{display:none}
+    .video-admin-progress{position:absolute;left:12px;right:12px;bottom:7px;z-index:5;width:calc(100% - 24px);height:3px;accent-color:var(--gold)}
+    .video-admin-progress[hidden]{display:none}
+    .video-file-input{display:none}
     html[data-site-theme="classic-glass"] .video-title{color:#f4f8ff;background:rgba(8,22,41,.72);border-color:rgba(151,207,249,.5);box-shadow:0 10px 28px rgba(0,5,17,.4),inset 0 1px rgba(240,250,255,.16)}
-    html[data-site-theme="classic-glass"] .video-admin{background:rgba(8,22,41,.54);border-color:rgba(151,207,249,.35);backdrop-filter:blur(16px)}
+    html[data-site-theme="classic-glass"] .video-admin-tools button{color:#eff8ff;border-color:rgba(151,207,249,.58);background:rgba(8,22,41,.68)}
+    html[data-site-theme="classic-glass"] .video-admin-tools [data-video-remove]{color:#ffe5e2;border-color:rgba(255,179,169,.58)}
+    html[data-site-theme="classic-glass"] .video-admin-status{background:rgba(8,22,41,.82);border-color:rgba(151,207,249,.35)}
     @media(max-width:520px){.video-carousel{width:100%}.video-frame{border-radius:13px}.video-title{left:8px;right:8px;bottom:8px;padding:8px 10px;font-size:12px}.video-controls{gap:12px}.video-controls button{width:38px;height:36px}}
     .video-controls button{width:34px;height:30px;border:1px solid rgba(231,196,124,.46);border-radius:999px;color:#f0d9a0;background:rgba(255,255,255,.055);font:16px/1 system-ui;cursor:pointer}
     .video-controls button:hover,.video-controls button:focus-visible{background:rgba(231,196,124,.18);outline:2px solid var(--blue);outline-offset:2px}
@@ -101,17 +113,16 @@
       </div>
       <p class="video-status" data-video-status role="status" aria-live="polite">Sign in to view the private family videos.</p>
       <a class="video-login" data-video-login href="login.html?next=%2F">Sign in to watch</a>
-      <div class="video-admin" data-video-admin hidden>
-        <label for="family-video-target">Family admin: upload or replace one video at a time. For Jose, choose the compatible Jose Kadavy.mp4 conversion.</label>
-        <select id="family-video-target" aria-label="Choose family video to upload">
-          <option value="thankamma">Thankamma_Kochappan.mp4</option>
-          <option value="anthony">Anthony kadavy.mp4</option>
-          <option value="jose">Jose Kadavy.MOV (choose Jose Kadavy.mp4)</option>
-        </select>
-        <input id="family-video-file" type="file" accept="video/mp4,.mp4">
-        <progress data-video-progress max="100" value="0" hidden></progress>
-        <button type="button" data-video-upload>Upload selected video to private Google Drive</button>
-        <span data-video-admin-status role="status" aria-live="polite"></span>
+      <div class="video-admin-tools" data-video-admin hidden>
+        <button type="button" data-video-upload aria-label="Upload video to this slot" title="Upload or replace this video">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 7.5h7l2 2h9v9.2A1.8 1.8 0 0 1 19.2 20H4.8A1.8 1.8 0 0 1 3 18.2z"/><path d="M12 16V10m-2.5 2.5L12 10l2.5 2.5"/></svg>
+        </button>
+        <button type="button" data-video-remove aria-label="Remove this video" title="Remove this video" hidden>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-.8 13H6.8L6 7m4 3v6m4-6v6"/></svg>
+        </button>
+        <input class="video-file-input" id="family-video-file" type="file" accept="video/mp4,.mp4" tabindex="-1" aria-hidden="true">
+        <progress class="video-admin-progress" data-video-progress max="100" value="0" hidden></progress>
+        <span class="video-admin-status" data-video-admin-status role="status" aria-live="polite"></span>
       </div>
     </section>
     <a class="explore" href="tree.html"><span>Explore</span><span class="arrow" aria-hidden="true">→</span></a>
@@ -125,8 +136,8 @@
       const login = document.querySelector('[data-video-login]');
       const admin = document.querySelector('[data-video-admin]');
       const fileInput = document.querySelector('#family-video-file');
-      const targetInput = document.querySelector('#family-video-target');
       const uploadButton = document.querySelector('[data-video-upload]');
+      const removeButton = document.querySelector('[data-video-remove]');
       const uploadStatus = document.querySelector('[data-video-admin-status]');
       const progress = document.querySelector('[data-video-progress]');
       const specs = [
@@ -142,6 +153,13 @@
           slide.hidden = !active;
           if (!active) { video.pause(); slide.querySelector('.video-title').hidden = true; }
           dots[i].setAttribute('aria-current', String(active));
+          if (active) {
+            uploadButton.setAttribute('aria-label', 'Upload or replace ' + slide.dataset.videoName);
+            uploadButton.title = 'Upload or replace ' + slide.dataset.videoName;
+            removeButton.hidden = !available.has(slide.dataset.videoId);
+            removeButton.setAttribute('aria-label', 'Remove ' + slide.dataset.videoName);
+            removeButton.title = 'Remove ' + slide.dataset.videoName;
+          }
           if (active && available.has(slide.dataset.videoId)) {
             if (!video.src) { video.src = '/api/videos/' + encodeURIComponent(slide.dataset.videoId); video.controls = true; video.load(); }
             slide.querySelector('.video-placeholder').hidden = true;
@@ -171,7 +189,7 @@
           signedIn = true; login.hidden = true; available = new Set(data.available || []);
           admin.hidden = !data.canUpload;
           if (available.size) setMessage('Private family videos · Family sign-in active');
-          else setMessage('The family admin can upload the videos to Google Drive here.');
+          else setMessage('Family videos are not available yet.');
           updateSlide();
         } catch (error) { setMessage(error.message || 'Family videos are temporarily unavailable.'); }
       }
@@ -191,16 +209,15 @@
           if (result.done) break;
         }
       }
-      uploadButton.addEventListener('click', async () => {
-        const spec = specs.find(item => item.id === targetInput.value);
+      uploadButton.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', async () => {
+        const spec = specs.find(item => item.id === slides[current].dataset.videoId);
         const file = fileInput.files[0];
         if (!spec || !file || file.name !== spec.uploadName) {
-          uploadStatus.textContent = spec?.id === 'jose'
-            ? 'Choose the compatible Jose Kadavy.mp4 conversion.'
-            : 'Choose the matching MP4 file for the selected family video.';
+          uploadStatus.textContent = spec?.id === 'jose' ? 'Choose the compatible Jose Kadavy.mp4 conversion.' : 'Choose ' + (spec?.uploadName || 'the matching MP4 file') + '.';
           return;
         }
-        uploadButton.disabled = true; fileInput.disabled = true; targetInput.disabled = true; progress.hidden = false; progress.value = 0;
+        uploadButton.disabled = true; removeButton.disabled = true; fileInput.disabled = true; progress.hidden = false; progress.value = 0;
         try {
           await uploadFile(file, spec);
           uploadStatus.textContent = spec.title + ' is saved privately in Google Drive.';
@@ -208,7 +225,24 @@
           slides.forEach(slide => { const video = slide.querySelector('video'); video.removeAttribute('src'); video.load(); slide.querySelector('.video-title').hidden = true; });
           show(current);
         } catch (error) { uploadStatus.textContent = error.message || 'Upload failed.'; }
-        finally { uploadButton.disabled = false; fileInput.disabled = false; targetInput.disabled = false; }
+        finally { uploadButton.disabled = false; removeButton.disabled = false; fileInput.disabled = false; fileInput.value = ''; setTimeout(() => { progress.hidden = true; uploadStatus.textContent = ''; }, 4000); }
+      });
+      removeButton.addEventListener('click', async () => {
+        const slide = slides[current], id = slide.dataset.videoId, spec = specs.find(item => item.id === id);
+        if (!available.has(id) || !spec || !window.confirm('Remove ' + spec.title + ' from the family video slot?')) return;
+        uploadButton.disabled = true; removeButton.disabled = true; uploadStatus.textContent = 'Removing ' + spec.title + '…';
+        try {
+          const response = await fetch('/api/videos/' + encodeURIComponent(id), {method:'DELETE', credentials:'same-origin'});
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(result.error || 'Could not remove this video.');
+          available.delete(id);
+          const video = slide.querySelector('video'); video.pause(); video.removeAttribute('src'); video.load();
+          slide.querySelector('.video-title').hidden = true;
+          await refresh();
+          uploadStatus.textContent = spec.title + ' was removed.';
+          setTimeout(() => { uploadStatus.textContent = ''; }, 3500);
+        } catch (error) { uploadStatus.textContent = error.message || 'Could not remove this video.'; }
+        finally { uploadButton.disabled = false; removeButton.disabled = false; }
       });
       show(0); refresh();
     })();
