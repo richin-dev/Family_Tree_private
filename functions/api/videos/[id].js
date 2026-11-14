@@ -1,11 +1,10 @@
-import { json, readSession } from '../../../lib/auth.js';
+import { json } from '../../../lib/auth.js';
 import { signedInAdmin, unauthorizedAdmin } from '../../../lib/access.js';
 import { driveRequest } from '../../../lib/google-drive.js';
 
 const IDS = new Set(['thankamma','anthony','jose']);
 
 export async function onRequestGet(ctx) {
-  if (!await readSession(ctx.env,ctx.request.headers.get('Cookie'))) return new Response('Sign in to view family videos.',{status:401,headers:{'Cache-Control':'no-store'}});
   const id = String(ctx.params.id || '');
   if (!IDS.has(id) || !ctx.env.FAMILY_DB) return new Response('Not found.',{status:404});
   try {

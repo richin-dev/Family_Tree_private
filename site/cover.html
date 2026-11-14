@@ -46,8 +46,7 @@
     .video-admin-tools button{position:absolute;display:grid;place-items:center;width:42px;height:42px;padding:0;border:1px solid rgba(240,217,160,.68);border-radius:50%;color:#fff4d5;background:rgba(7,13,20,.66);box-shadow:0 4px 18px rgba(0,0,0,.3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:pointer;pointer-events:auto;transition:background .18s,transform .18s}
     .video-admin-tools button:hover{transform:scale(1.06);background:rgba(7,13,20,.88)}
     .video-admin-tools button:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
-    .video-admin-tools [data-video-upload]{top:50%;left:50%;transform:translate(-50%,-50%)}
-    .video-admin-tools [data-video-upload]:hover{transform:translate(-50%,-50%) scale(1.06)}
+    .video-admin-tools [data-video-upload]{top:10px;left:10px}
     .video-admin-tools [data-video-remove]{top:10px;right:10px;width:34px;height:34px;color:#ffe1dc;border-color:rgba(255,190,178,.62)}
     .video-admin-tools [data-video-remove][hidden]{display:none}
     .video-admin-tools svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -172,7 +171,7 @@
           } else if (active) {
             video.controls = false;
             slide.querySelector('.video-placeholder').hidden = false;
-            slide.querySelector('.video-placeholder span:last-child').textContent = signedIn ? 'This video has not been uploaded yet.' : 'Sign in to view this private video.';
+            slide.querySelector('.video-placeholder span:last-child').textContent = 'This video has not been uploaded yet.';
           }
         });
       }
@@ -189,7 +188,7 @@
       async function refresh() {
         try {
           const response = await fetch('/api/videos', {credentials:'same-origin', cache:'no-store'});
-          if (response.status === 401) { signedIn = false; login.hidden = false; setMessage('Family videos are private to signed-in family members.'); return; }
+          if (response.status === 401) { signedIn = false; login.hidden = false; setMessage('Videos are temporarily unavailable.'); return; }
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || 'Video storage is not ready.');
           signedIn = true; login.hidden = true; available = new Set(data.available || []);
